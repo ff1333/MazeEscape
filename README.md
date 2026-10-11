@@ -1,10 +1,11 @@
-# Maze Escape（迷宫逃生）
+# 迷宫逃生 / Maze Escape
 
-使用 Unity 6 与 C# 开发、在 AI 辅助下持续迭代的 3D 生存迷宫作品。玩家在迷宫外选择冲锋枪或长刀，从入口进入程序化生成的迷宫，在僵尸追击和环境压力下寻找终点。游戏支持第一/第三人称切换、十关顺序解锁和本地进度保存。
+使用 Unity 6 与 C# 开发的 3D 生存迷宫作品。玩家在迷宫外选择冲锋枪或长刀，从入口进入程序化生成的迷宫，在僵尸追击和环境压力下寻找终点。游戏支持第一/第三人称切换、十关顺序解锁和本地进度保存。
 
 **当前正式版 v1.3.1**：对外名称统一为《迷宫逃生》/ Maze Escape，默认简体中文，支持英文切换、静音、总音量、音乐与音效音量，并保留十关迷宫、全图避难灯、装弹反馈和此前的战斗修复。
 
 - [下载 GitHub Release v1.3.1](https://github.com/ff1333/MazeEscape/releases/tag/v1.3.1)
+- [作品集演示视频](https://github.com/ff1333/MazeEscape/releases/download/v1.3.1/MazeEscape-v1.3.1-portfolio-720p.mp4)（中文旁白与字幕）
 - [v1.3.1 发布说明](docs/RELEASE_NOTES_v1.3.1.md)
 - [v1.3.0 设置与开发记录](docs/13_V1_3_0_SETTINGS.md)
 - [v1.3.0 自动测试、平台构建与验收边界](docs/test-results/v1.3.0/README.md)
