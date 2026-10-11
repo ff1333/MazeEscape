@@ -11,13 +11,13 @@ public static class FogboundProjectBuilder
 {
     private const string MainScene = "Assets/Scenes/Main.unity";
 
-    [MenuItem("Fogbound Maze/Build Project Scene")]
+    [MenuItem("Maze Escape/Build Project Scene")]
     public static void BuildProjectScene()
     {
         ConfigureProject();
         CreateVisualAssets();
         var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-        var root = new GameObject("Fogbound Maze");
+        var root = new GameObject("Maze Escape");
         root.AddComponent<GameDirector>();
         EditorSceneManager.SaveScene(scene, MainScene);
         EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(MainScene, true) };
@@ -25,7 +25,7 @@ public static class FogboundProjectBuilder
         Debug.Log("FOGBOUND_BUILD_SCENE_PASS");
     }
 
-    [MenuItem("Fogbound Maze/Validate Release Boundary")]
+    [MenuItem("Maze Escape/Validate Release Boundary")]
     public static void ValidateReleaseBoundary()
     {
         var failures = new List<string>();
@@ -87,7 +87,7 @@ public static class FogboundProjectBuilder
     private static void ConfigureProject()
     {
         PlayerSettings.companyName = "FF1333";
-        PlayerSettings.productName = "Fogbound Maze";
+        PlayerSettings.productName = "Maze Escape";
         PlayerSettings.bundleVersion = FogboundMaze.ReleaseVersion.Current;
         PlayerSettings.defaultScreenWidth = 1280;
         PlayerSettings.defaultScreenHeight = 720;

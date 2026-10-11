@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="15" result="Passed" total="15" passed="15" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-10-11 08:25:52Z" end-time="2026-10-11 08:25:54Z" duration="2.3762202">
+  <test-suite type="TestSuite" id="1000" name="Maze Escape" fullname="Maze Escape" runstate="Runnable" testcasecount="15" result="Passed" start-time="2026-10-11 08:25:52Z" end-time="2026-10-11 08:25:54Z" duration="2.376220" total="15" passed="15" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1020" name="FogboundMaze.EditModeTests.dll" fullname="D:/software/documents/unity_games/projects/learning/FogboundMaze/Library/ScriptAssemblies/FogboundMaze.EditModeTests.dll" runstate="Runnable" testcasecount="15" result="Passed" start-time="2026-10-11 08:25:52Z" end-time="2026-10-11 08:25:54Z" duration="2.368250" total="15" passed="15" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="16100" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1021" name="FogboundMaze" fullname="FogboundMaze" runstate="Runnable" testcasecount="15" result="Passed" start-time="2026-10-11 08:25:52Z" end-time="2026-10-11 08:25:54Z" duration="2.367440" total="15" passed="15" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1022" name="Tests" fullname="FogboundMaze.Tests" runstate="Runnable" testcasecount="15" result="Passed" start-time="2026-10-11 08:25:52Z" end-time="2026-10-11 08:25:54Z" duration="2.367117" total="15" passed="15" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1001" name="MazeCoreTests" fullname="FogboundMaze.Tests.MazeCoreTests" classname="FogboundMaze.Tests.MazeCoreTests" runstate="Runnable" testcasecount="10" result="Passed" start-time="2026-10-11 08:25:52Z" end-time="2026-10-11 08:25:53Z" duration="1.922863" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1002" name="Campaign_HasFrequentBranchesInsteadOfLongSingleCorridors" fullname="FogboundMaze.Tests.MazeCoreTests.Campaign_HasFrequentBranchesInsteadOfLongSingleCorridors" methodname="Campaign_HasFrequentBranchesInsteadOfLongSingleCorridors" classname="FogboundMaze.Tests.MazeCoreTests" runstate="Runnable" seed="2003060822" result="Passed" start-time="2026-10-11 08:25:52Z" end-time="2026-10-11 08:25:52Z" duration="0.592281" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Level 1: route=17 junctions=10 routeChoices=8 firstChoice=2 longestGap=2
+Level 2: route=21 junctions=12 routeChoices=7 firstChoice=0 longestGap=7
+Level 3: route=25 junctions=17 routeChoices=13 firstChoice=0 longestGap=3
+Level 4: route=29 junctions=21 routeChoices=13 firstChoice=0 longestGap=5
+Level 5: route=32 junctions=23 routeChoices=13 firstChoice=2 longestGap=5
+Level 6: route=35 junctions=23 routeChoices=11 firstChoice=0 longestGap=7
+Level 7: route=38 junctions=25 routeChoices=13 firstChoice=1 longestGap=6
+Level 8: route=42 junctions=31 routeChoices=11 firstChoice=1 longestGap=8
+Level 9: route=46 junctions=36 routeChoices=16 firstChoice=1 longestGap=5
+Level 10: route=50 junctions=40 routeChoices=20 firstChoice=0 longestGap=4
+]]></output>
+            </test-case>
+            <test-case id="1012" name="Campaign_MainRouteLengthIncreasesEveryLevel" fullname="FogboundMaze.Tests.MazeCoreTests.Campaign_MainRouteLengthIncreasesEveryLevel" methodname="Campaign_MainRouteLengthIncreasesEveryLevel" classname="FogboundMaze.Tests.MazeCoreTests" runstate="Runnable" seed="1458261226" result="Passed" start-time="2026-10-11 08:25:52Z" end-time="2026-10-11 08:25:53Z" duration="0.565316" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1009" name="DefaultCampaign_ContainsValidatedProgression" fullname="FogboundMaze.Tests.MazeCoreTests.DefaultCampaign_ContainsValidatedProgression" methodname="DefaultCampaign_ContainsValidatedProgression" classname="FogboundMaze.Tests.MazeCoreTests" runstate="Runnable" seed="167557295" result="Passed" start-time="2026-10-11 08:25:53Z" end-time="2026-10-11 08:25:53Z" duration="0.005990" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1010" name="DefaultCampaign_UsesTenDifferentSolvableMazes" fullname="FogboundMaze.Tests.MazeCoreTests.DefaultCampaign_UsesTenDifferentSolvableMazes" methodname="DefaultCampaign_UsesTenDifferentSolvableMazes" classname="FogboundMaze.Tests.MazeCoreTests" runstate="Runnable" seed="451061396" result="Passed" start-time="2026-10-11 08:25:53Z" end-time="2026-10-11 08:25:53Z" duration="0.572594" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1008" name="Exploration_RevealsOnlyVisitedCells" fullname="FogboundMaze.Tests.MazeCoreTests.Exploration_RevealsOnlyVisitedCells" methodname="Exploration_RevealsOnlyVisitedCells" classname="FogboundMaze.Tests.MazeCoreTests" runstate="Runnable" seed="19512968" result="Passed" start-time="2026-10-11 08:25:53Z" end-time="2026-10-11 08:25:53Z" duration="0.000835" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1006" name="GeneratedMaze_HasPathFromStartToGoal" fullname="FogboundMaze.Tests.MazeCoreTests.GeneratedMaze_HasPathFromStartToGoal" classname="FogboundMaze.Tests.MazeCoreTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-10-11 08:25:53Z" end-time="2026-10-11 08:25:53Z" duration="0.009660" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1003" name="GeneratedMaze_HasPathFromStartToGoal(7,7,1101)" fullname="FogboundMaze.Tests.MazeCoreTests.GeneratedMaze_HasPathFromStartToGoal(7,7,1101)" methodname="GeneratedMaze_HasPathFromStartToGoal" classname="FogboundMaze.Tests.MazeCoreTests" runstate="Runnable" seed="666145675" result="Passed" start-time="2026-10-11 08:25:53Z" end-time="2026-10-11 08:25:53Z" duration="0.002494" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1004" name="GeneratedMaze_HasPathFromStartToGoal(10,10,4409)" fullname="FogboundMaze.Tests.MazeCoreTests.GeneratedMaze_HasPathFromStartToGoal(10,10,4409)" methodname="GeneratedMaze_HasPathFromStartToGoal" classname="FogboundMaze.Tests.MazeCoreTests" runstate="Runnable" seed="999816614" result="Passed" start-time="2026-10-11 08:25:53Z" end-time="2026-10-11 08:25:53Z" duration="0.000369" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1005" name="GeneratedMaze_HasPathFromStartToGoal(15,14,10151)" fullname="FogboundMaze.Tests.MazeCoreTests.GeneratedMaze_HasPathFromStartToGoal(15,14,10151)" methodname="GeneratedMaze_HasPathFromStartToGoal" classname="FogboundMaze.Tests.MazeCoreTests" runstate="Runnable" seed="1933882591" result="Passed" start-time="2026-10-11 08:25:53Z" end-time="2026-10-11 08:25:53Z" duration="0.003928" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-case id="1007" name="GeneratedMaze_IsDeterministicForSameSeed" fullname="FogboundMaze.Tests.MazeCoreTests.GeneratedMaze_IsDeterministicForSameSeed" methodname="GeneratedMaze_IsDeterministicForSameSeed" classname="FogboundMaze.Tests.MazeCoreTests" runstate="Runnable" seed="2097388486" result="Passed" start-time="2026-10-11 08:25:53Z" end-time="2026-10-11 08:25:53Z" duration="0.000576" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1011" name="LaterCampaignMazes_AreLargerAndUseMoreCandidateSelection" fullname="FogboundMaze.Tests.MazeCoreTests.LaterCampaignMazes_AreLargerAndUseMoreCandidateSelection" methodname="LaterCampaignMazes_AreLargerAndUseMoreCandidateSelection" classname="FogboundMaze.Tests.MazeCoreTests" runstate="Runnable" seed="1765398725" result="Passed" start-time="2026-10-11 08:25:53Z" end-time="2026-10-11 08:25:53Z" duration="0.163436" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1013" name="SafeLightLayoutTests" fullname="FogboundMaze.Tests.SafeLightLayoutTests" classname="FogboundMaze.Tests.SafeLightLayoutTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-10-11 08:25:53Z" end-time="2026-10-11 08:25:54Z" duration="0.443078" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="ParameterizedMethod" id="1018" name="LateCampaignLights_CoverBranchesWithoutRemovingMiasma" fullname="FogboundMaze.Tests.SafeLightLayoutTests.LateCampaignLights_CoverBranchesWithoutRemovingMiasma" classname="FogboundMaze.Tests.SafeLightLayoutTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-10-11 08:25:53Z" end-time="2026-10-11 08:25:54Z" duration="0.426921" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1014" name="LateCampaignLights_CoverBranchesWithoutRemovingMiasma(7)" fullname="FogboundMaze.Tests.SafeLightLayoutTests.LateCampaignLights_CoverBranchesWithoutRemovingMiasma(7)" methodname="LateCampaignLights_CoverBranchesWithoutRemovingMiasma" classname="FogboundMaze.Tests.SafeLightLayoutTests" runstate="Runnable" seed="885627157" result="Passed" start-time="2026-10-11 08:25:53Z" end-time="2026-10-11 08:25:54Z" duration="0.065834" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Level 7: lamps=27, offRoute=17, deadEnds=7, unsafeCells=27, exposedMeters=12.0, walkDamage=10.0, sprintDamage=6.7
+]]></output>
+              </test-case>
+              <test-case id="1015" name="LateCampaignLights_CoverBranchesWithoutRemovingMiasma(8)" fullname="FogboundMaze.Tests.SafeLightLayoutTests.LateCampaignLights_CoverBranchesWithoutRemovingMiasma(8)" methodname="LateCampaignLights_CoverBranchesWithoutRemovingMiasma" classname="FogboundMaze.Tests.SafeLightLayoutTests" runstate="Runnable" seed="1540958127" result="Passed" start-time="2026-10-11 08:25:54Z" end-time="2026-10-11 08:25:54Z" duration="0.089993" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Level 8: lamps=31, offRoute=21, deadEnds=6, unsafeCells=33, exposedMeters=25.9, walkDamage=28.8, sprintDamage=19.2
+]]></output>
+              </test-case>
+              <test-case id="1016" name="LateCampaignLights_CoverBranchesWithoutRemovingMiasma(9)" fullname="FogboundMaze.Tests.SafeLightLayoutTests.LateCampaignLights_CoverBranchesWithoutRemovingMiasma(9)" methodname="LateCampaignLights_CoverBranchesWithoutRemovingMiasma" classname="FogboundMaze.Tests.SafeLightLayoutTests" runstate="Runnable" seed="977479141" result="Passed" start-time="2026-10-11 08:25:54Z" end-time="2026-10-11 08:25:54Z" duration="0.118175" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Level 9: lamps=38, offRoute=28, deadEnds=5, unsafeCells=32, exposedMeters=18.9, walkDamage=26.3, sprintDamage=17.5
+]]></output>
+              </test-case>
+              <test-case id="1017" name="LateCampaignLights_CoverBranchesWithoutRemovingMiasma(10)" fullname="FogboundMaze.Tests.SafeLightLayoutTests.LateCampaignLights_CoverBranchesWithoutRemovingMiasma(10)" methodname="LateCampaignLights_CoverBranchesWithoutRemovingMiasma" classname="FogboundMaze.Tests.SafeLightLayoutTests" runstate="Runnable" seed="1654308173" result="Passed" start-time="2026-10-11 08:25:54Z" end-time="2026-10-11 08:25:54Z" duration="0.152155" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[Level 10: lamps=44, offRoute=34, deadEnds=10, unsafeCells=31, exposedMeters=37.6, walkDamage=62.7, sprintDamage=41.8
+]]></output>
+              </test-case>
+            </test-suite>
+            <test-case id="1019" name="ReloadCompletionClip_IsDistinctAndContainsTwoAudiblePulses" fullname="FogboundMaze.Tests.SafeLightLayoutTests.ReloadCompletionClip_IsDistinctAndContainsTwoAudiblePulses" methodname="ReloadCompletionClip_IsDistinctAndContainsTwoAudiblePulses" classname="FogboundMaze.Tests.SafeLightLayoutTests" runstate="Runnable" seed="1726845739" result="Passed" start-time="2026-10-11 08:25:54Z" end-time="2026-10-11 08:25:54Z" duration="0.015179" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: D:\software\documents\unity_games\projects\learning\FogboundMaze\Builds\Verification\v1.3.1\EditMode.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

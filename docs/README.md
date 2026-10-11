@@ -1,4 +1,4 @@
-# Fogbound Maze 文档入口
+# Maze Escape / 迷宫逃生文档入口
 
 **当前 v1.2.2：先看 [12_V1_2_2_LIGHTS_AND_RELOAD.md](12_V1_2_2_LIGHTS_AND_RELOAD.md)。** 避难灯不再指向出口，装弹完成增加声音与 READY 提示。
 v1.2.1 的右手冲锋枪、长刀与命中反馈见 [11_V1_2_1_WEAPONS.md](11_V1_2_1_WEAPONS.md)。

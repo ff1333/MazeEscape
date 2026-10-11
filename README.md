@@ -1,8 +1,8 @@
-# Fogbound Maze
+# Maze Escape / 迷宫逃生
 
-Current candidate: **v1.3.0**. Chinese is the default UI language; the title-screen Settings menu supports English, mute, master/music/effects volume and local persistence. See [the settings guide and development log](docs/13_V1_3_0_SETTINGS.md) and [verification evidence](docs/test-results/v1.3.0/README.md). All earlier maze, lighting, reload and combat improvements are retained.
+Current candidate: **v1.3.1**. This release changes the public product name from Fogbound Maze / 迷雾逃生 to Maze Escape / 迷宫逃生 so the title matches the full ten-level experience. Chinese remains the default UI language. All v1.3.0 maze, lighting, reload, combat, localization and audio features are retained.
 
-Fogbound Maze is a Unity 6 third-person and first-person survival maze game.
+Maze Escape is a Unity 6 third-person and first-person survival maze game.
 The player starts at the title screen, selects an unlocked level, then chooses
 an SMG or long blade outside a procedurally generated maze,
 enters through the start gate, survives zombie attacks, and reaches the exit.
@@ -34,7 +34,7 @@ under `docs/`.
 
 ## Screenshots
 
-![v1.3.0 title screen](docs/test-results/v1.3.0/native/v1.3.0-title-zh.png)
+![v1.3.1 title screen](docs/test-results/v1.3.1/native/title-zh.png)
 
 ![Language and audio settings](docs/test-results/v1.3.0/native/v1.3.0-settings-en.png)
 
@@ -44,7 +44,9 @@ under `docs/`.
 
 ## Current Validation
 
-- EditMode: **15/15 PASS**; PlayMode: **34/34 PASS**.
+- EditMode: **15/15 PASS**; PlayMode: **35/35 PASS**.
+- Windows/WebGL: **0 errors / 0 warnings**; Android: **0 errors / 24 build-chain warnings**.
+- Current verification: [v1.3.1 evidence](docs/test-results/v1.3.1/README.md).
 - Platform results and device-testing limitations: [v1.2.2 evidence](docs/test-results/v1.2.2/README.md).
 - Current development log: [safe lights and reload feedback](docs/devlogs/10-safe-lights-and-reload-feedback.md).
 - Release attachments: `Builds/Packages/v1.2.2/` (ignored by Git).

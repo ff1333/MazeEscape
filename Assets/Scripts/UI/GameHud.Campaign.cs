@@ -15,7 +15,7 @@ namespace FogboundMaze
         {
             titlePanel = PanelObject("Title Screen", transform, new Color(0.02f, 0.035f, 0.04f, 0.54f));
             SetRect(titlePanel.GetComponent<RectTransform>(), Vector2.zero, Vector2.one);
-            var title = Label("Game Title", titlePanel.transform, "FOGBOUND\nMAZE", 100, TextAnchor.MiddleLeft);
+            var title = Label("Game Title", titlePanel.transform, "MAZE\nESCAPE", 100, TextAnchor.MiddleLeft);
             SetRect(title.rectTransform, new Vector2(0.08f, 0.52f), new Vector2(0.65f, 0.87f));
             var subtitle = Label("Campaign", titlePanel.transform, "SURVIVAL CAMPAIGN", 27, TextAnchor.MiddleLeft, Accent);
             SetRect(subtitle.rectTransform, new Vector2(0.08f, 0.45f), new Vector2(0.50f, 0.51f));

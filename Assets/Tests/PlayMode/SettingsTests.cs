@@ -18,7 +18,7 @@ namespace FogboundMaze.Tests
                 SceneManager.LoadScene("Main");yield return null;yield return null;yield return null;
                 PortfolioSettings.SetLanguage(true);
                 var title=GameDirector.Instance.Hud.transform.Find("Title Screen/Game Title").GetComponent<Text>();
-                title.GetComponent<LocalizedLabel>().Refresh();Assert.That(title.text,Is.EqualTo("迷雾\n逃生"));
+                title.GetComponent<LocalizedLabel>().Refresh();Assert.That(title.text,Is.EqualTo("迷宫\n逃生"));
                 GameDirector.Instance.ShowGuide();
                 GameDirector.Instance.Hud.transform.Find("Field Guide/Chapter 7").GetComponent<Button>().onClick.Invoke();
                 foreach(var label in GameDirector.Instance.Hud.GetComponentsInChildren<LocalizedLabel>()) label.Refresh();
@@ -26,7 +26,7 @@ namespace FogboundMaze.Tests
                 Assert.That(guideText,Does.Contain("瘴气与避难灯"));
                 Assert.That(guideText,Does.Not.Contain("Miasma drains"));
                 PortfolioSettingsMenu.Instance.Open();Assert.That(PortfolioSettings.IsOpen,Is.True);
-                PortfolioSettings.SetLanguage(false);title.GetComponent<LocalizedLabel>().Refresh();Assert.That(title.text,Is.EqualTo("FOGBOUND\nMAZE"));
+                PortfolioSettings.SetLanguage(false);title.GetComponent<LocalizedLabel>().Refresh();Assert.That(title.text,Is.EqualTo("MAZE\nESCAPE"));
                 PortfolioSettings.SetVolume("Master",.41f);PortfolioSettings.SetVolume("Effects",.22f);PortfolioSettings.SetVolume("Music",.18f);PortfolioSettings.SetSound(false);
                 PortfolioSettingsMenu.Instance.Close();Assert.That(AudioListener.volume,Is.Zero);
                 SceneManager.LoadScene("Main");yield return null;yield return null;yield return null;
