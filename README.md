@@ -1,16 +1,16 @@
-# Fogbound Maze（迷雾逃生）
+# Maze Escape（迷宫逃生）
 
 使用 Unity 6 与 C# 开发、在 AI 辅助下持续迭代的 3D 生存迷宫作品。玩家在迷宫外选择冲锋枪或长刀，从入口进入程序化生成的迷宫，在僵尸追击和环境压力下寻找终点。游戏支持第一/第三人称切换、十关顺序解锁和本地进度保存。
 
-**当前正式版 v1.3.0**：默认简体中文，支持英文切换、静音、总音量、音乐与音效音量，并保留十关迷宫、全图避难灯、装弹反馈和此前的战斗修复。
+**当前正式版 v1.3.1**：对外名称统一为《迷宫逃生》/ Maze Escape，默认简体中文，支持英文切换、静音、总音量、音乐与音效音量，并保留十关迷宫、全图避难灯、装弹反馈和此前的战斗修复。
 
-- [下载 GitHub Release v1.3.0](https://github.com/ff1333/FogboundMaze/releases/tag/v1.3.0)
-- [v1.3.0 发布说明](docs/RELEASE_NOTES_v1.3.0.md)
+- [下载 GitHub Release v1.3.1](https://github.com/ff1333/MazeEscape/releases/tag/v1.3.1)
+- [v1.3.1 发布说明](docs/RELEASE_NOTES_v1.3.1.md)
 - [v1.3.0 设置与开发记录](docs/13_V1_3_0_SETTINGS.md)
 - [v1.3.0 自动测试、平台构建与验收边界](docs/test-results/v1.3.0/README.md)
 - [文档阅读入口](docs/README.md)
 
-![v1.3.0 中文开始界面](docs/test-results/v1.3.0/native/v1.3.0-title-zh.png)
+![v1.3.1 中文开始界面](docs/test-results/v1.3.1/native/title-zh.png)
 
 ![中英文与声音设置](docs/test-results/v1.3.0/native/v1.3.0-settings-en.png)
 
@@ -72,12 +72,13 @@
 
 - EditMode：`15/15 PASS`
 - PlayMode：`35/35 PASS`
-- Windows / WebGL / Android：构建成功，发布附件和 SHA-256 已核对
+- Windows / WebGL：构建成功，0 errors，0 warnings
+- Android：构建成功，0 errors，24 条构建链警告
 - Windows：独立 Player 的中文设置、图鉴、武器选择和第一人称 HUD 画面通过检查
 - WebGL：Edge 中完成设置、图鉴、选关、选武器、移动、攻击、装弹和暂停交互，未捕获游戏异常
 - Android：作者已完成一次 v1.3.0 真实设备基本验收，未发现阻塞发布的问题
 
-详细证据与告警边界见 [v1.3.0 验证索引](docs/test-results/v1.3.0/README.md)。一次真机基本验收不代表多机型兼容、长时间压力、十关手动通关或商店审核完成。
+详细证据与告警边界见 [v1.3.1 验证索引](docs/test-results/v1.3.1/README.md)。一次真机基本验收不代表多机型兼容、长时间压力、十关手动通关或商店审核完成。
 
 ## 项目结构
 
@@ -102,7 +103,7 @@ docs/
 4. 打开 `Assets/Scenes/Main.unity`。
 5. Console 没有红色错误后，点击 Unity 顶部三角形 Play。
 
-正式包位于 [GitHub Release v1.3.0](https://github.com/ff1333/FogboundMaze/releases/tag/v1.3.0)。Windows ZIP 需要完整解压后运行 exe；WebGL ZIP 需要 HTTP 静态托管；Android APK 为作品集测试分发包。
+正式包位于 [GitHub Release v1.3.1](https://github.com/ff1333/MazeEscape/releases/tag/v1.3.1)。Windows ZIP 需要完整解压后运行 `MazeEscape.exe`；WebGL ZIP 需要 HTTP 静态托管；Android APK 为作品集测试分发包。
 
 ## 素材与能力边界
 

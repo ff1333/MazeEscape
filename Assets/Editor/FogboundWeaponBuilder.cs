@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class FogboundWeaponBuilder
 {
-    [MenuItem("Fogbound Maze/Build SMG And Long Blade")]
+    [MenuItem("Maze Escape/Build SMG And Long Blade")]
     public static void Build()
     {
         const string survivorPath = "Assets/Resources/Characters/Survivor.prefab";

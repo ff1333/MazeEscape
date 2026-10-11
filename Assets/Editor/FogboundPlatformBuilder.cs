@@ -11,18 +11,18 @@ public static class FogboundPlatformBuilder
 
     public static void BuildWindowsDevelopment()
     {
-        Build(BuildTarget.StandaloneWindows64, "Builds/Windows/Development/FogboundMaze.exe",
+        Build(BuildTarget.StandaloneWindows64, "Builds/Windows/Development/MazeEscape.exe",
             BuildOptions.Development | BuildOptions.AllowDebugging);
     }
 
     public static void BuildWindowsRelease()
     {
-        Build(BuildTarget.StandaloneWindows64, "Builds/Windows/v1.3.0/FogboundMaze.exe", BuildOptions.None);
+        Build(BuildTarget.StandaloneWindows64, "Builds/Windows/v1.3.1/MazeEscape.exe", BuildOptions.None);
     }
 
     public static void BuildWebGLRelease()
     {
-        Build(BuildTarget.WebGL, "Builds/WebGL/v1.3.0", BuildOptions.None);
+        Build(BuildTarget.WebGL, "Builds/WebGL/v1.3.1", BuildOptions.None);
     }
 
     public static void BuildAndroidRelease()
@@ -37,7 +37,7 @@ public static class FogboundPlatformBuilder
         EditorUserBuildSettings.buildAppBundle = false;
         PlayerSettings.Android.bundleVersionCode = FogboundMaze.ReleaseVersion.AndroidCode;
         PlayerSettings.Android.targetSdkVersion = AndroidSdkVersions.AndroidApiLevel36;
-        Build(BuildTarget.Android, "Builds/Android/FogboundMaze-v1.3.0.apk", BuildOptions.None);
+        Build(BuildTarget.Android, "Builds/Android/MazeEscape-v1.3.1.apk", BuildOptions.None);
     }
 
     private static void Build(BuildTarget target, string location, BuildOptions options)

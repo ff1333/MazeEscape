@@ -1,6 +1,6 @@
 {"entries":[
 {"en":"SETTINGS","zh":"设置"},{"en":"LANGUAGE","zh":"语言"},{"en":"SOUND ENABLED","zh":"开启声音"},{"en":"MASTER VOLUME","zh":"总音量"},{"en":"MUSIC VOLUME","zh":"音乐音量"},{"en":"EFFECTS VOLUME","zh":"音效音量"},
-{"en":"NEON ARENA","zh":"霓虹竞技场"},{"en":"FOGBOUND\nMAZE","zh":"迷雾\n逃生"},{"en":"SURVIVAL CAMPAIGN","zh":"生存战役"},
+{"en":"NEON ARENA","zh":"霓虹竞技场"},{"en":"MAZE\nESCAPE","zh":"迷宫\n逃生"},{"en":"SURVIVAL CAMPAIGN","zh":"生存战役"},
 {"en":"START RUN","zh":"开始游戏"},{"en":"RESTART RUN","zh":"重新开始"},{"en":"START","zh":"开始游戏"},{"en":"FIELD GUIDE","zh":"关卡图鉴"},{"en":"QUIT GAME","zh":"退出游戏"},{"en":"QUIT","zh":"退出游戏"},{"en":"BACK","zh":"返回"},{"en":"RESUME","zh":"继续游戏"},{"en":"PAUSED","zh":"已暂停"},
 {"en":"RUN OVER","zh":"本局结束"},{"en":"RUN LOST","zh":"挑战失败"},{"en":"VICTORY","zh":"胜利通关"},{"en":"CAMPAIGN CLEARED","zh":"战役通关"},{"en":"EXIT REACHED","zh":"抵达出口"},{"en":"RETRY","zh":"重新挑战"},{"en":"NEXT","zh":"下一关"},
 {"en":"SELECT LEVEL","zh":"选择关卡"},{"en":"LEVEL SELECT","zh":"选择关卡"},{"en":"BACK TO LEVELS","zh":"返回选关"},{"en":"BACK TO LOADOUT","zh":"重选武器"},{"en":"CHOOSE YOUR LOADOUT","zh":"选择你的武器"},{"en":"ONE WEAPON. ONE EXIT.","zh":"选择武器，寻找出口。"},{"en":"CHOOSE STARTING WEAPON","zh":"选择初始武器"},{"en":"CHOOSE WEAPON","zh":"选择武器"},{"en":"CHOOSE ONE","zh":"选择一项"},

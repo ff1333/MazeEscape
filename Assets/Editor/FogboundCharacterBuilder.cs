@@ -6,7 +6,7 @@ using UnityEngine;
 
 public static class FogboundCharacterBuilder
 {
-    [MenuItem("Fogbound Maze/Build Character Assets")]
+    [MenuItem("Maze Escape/Build Character Assets")]
     public static void Build()
     {
         AssetDatabase.Refresh();
