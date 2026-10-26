@@ -38,6 +38,14 @@ namespace FogboundMaze
                 yield break;
             }
             Debug.Log($"FOGBOUND_VERSION_PASS {Application.version}");
+            if (System.Array.Exists(arguments, value => value == "-fogboundPortfolioVideo"))
+            {
+                yield return RunPortfolioShot(ReadArgument(arguments,"-fogboundPortfolioShot"),levelNumber);
+                Debug.Log("FOGBOUND_PORTFOLIO_SHOT_PASS " + ReadArgument(arguments,"-fogboundPortfolioShot"));
+                PortfolioSettings.SetLanguage(previousLanguage);
+                Application.Quit(0);
+                yield break;
+            }
             if (guide)
             {
                 GameDirector.Instance.ShowGuide();
@@ -201,6 +209,225 @@ namespace FogboundMaze
                 if (arguments[i] == name) return arguments[i + 1];
             }
             return string.Empty;
+        }
+
+        private IEnumerator RunPortfolioShot(string shot,int levelNumber)
+        {
+            var director = GameDirector.Instance;
+            switch (shot)
+            {
+                case "settings":
+                    PortfolioSettingsMenu.Instance.Open();
+                    yield return new WaitForSecondsRealtime(10f);
+                    yield break;
+                case "guide":
+                    director.ShowGuide();
+                    yield return new WaitForSecondsRealtime(12f);
+                    yield break;
+                case "levels":
+                    for (var completed = 1; completed < 6; completed++)
+                        director.Progress.Complete(completed);
+                    director.ShowLevelSelection();
+                    yield return new WaitForSecondsRealtime(12f);
+                    yield break;
+                case "loadout":
+                    director.ShowLevelSelection();
+                    director.SelectLevel(1);
+                    yield return new WaitForSecondsRealtime(12f);
+                    yield break;
+                case "blade":
+                    yield return RunBladeCombat();
+                    yield break;
+                case "view":
+                    yield return PrepareLevel(Mathf.Max(1,levelNumber),WeaponType.SubmachineGun);
+                    director.CameraRig.TickLook(Vector2.zero,true);
+                    yield return WalkMazePath(7,false);
+                    yield return new WaitForSecondsRealtime(3f);
+                    director.CameraRig.TickLook(Vector2.zero,true);
+                    yield return WalkMazePath(4,false);
+                    yield break;
+                case "explore":
+                    yield return PrepareLevel(Mathf.Max(4,levelNumber),WeaponType.SubmachineGun);
+                    yield return WalkMazePath(12,true);
+                    yield return new WaitForSecondsRealtime(4f);
+                    yield break;
+                case "hazards":
+                    yield return PrepareLevel(Mathf.Max(8,levelNumber),WeaponType.SubmachineGun);
+                    yield return WalkMazePath(14,false);
+                    yield return new WaitForSecondsRealtime(4f);
+                    yield break;
+                case "gun":
+                    yield return RunGunCombat();
+                    yield break;
+                default:
+                    yield return new WaitForSecondsRealtime(10f);
+                    yield break;
+            }
+        }
+
+        private static IEnumerator PrepareLevel(int levelNumber,WeaponType weapon)
+        {
+            var director = GameDirector.Instance;
+            director.ShowLevelSelection();
+            for (var completed = 1; completed < levelNumber; completed++)
+                director.Progress.Complete(completed);
+            director.SelectLevel(levelNumber);
+            yield return null;
+            director.SelectWeapon(weapon);
+            yield return null;
+        }
+
+        private static IEnumerator WalkMazePath(int cells,bool spawnEnemy)
+        {
+            var director = GameDirector.Instance;
+            var path = MazePathfinder.FindPath(director.World.Layout,
+                director.World.Layout.Start,director.World.Layout.Goal);
+            var controller = director.Player.GetComponent<CharacterController>();
+            yield return MoveTo(controller,director.World.EntryPosition,4.5f);
+            var count = Mathf.Min(cells,path.Count);
+            EnemyAgent actor = null;
+            for (var i = 0; i < count; i++)
+            {
+                if (spawnEnemy && i == 4 && actor == null)
+                {
+                    var spawnCell = path[Mathf.Min(i + 3,path.Count - 1)];
+                    actor = FindFirstObjectByType<EnemyPool>().Spawn(
+                        director.Player,director.World,director.World.CellToWorld(spawnCell),false);
+                }
+                yield return MoveTo(controller,director.World.CellToWorld(path[i]),4.2f);
+                if (actor != null && actor.IsActive)
+                {
+                    AimAt(actor.transform.position);
+                    director.Player.Weapon.Tick(true,true,false);
+                }
+            }
+        }
+
+        private static IEnumerator RunGunCombat()
+        {
+            yield return PrepareLevel(1,WeaponType.SubmachineGun);
+            var director = GameDirector.Instance;
+            var path = MazePathfinder.FindPath(director.World.Layout,
+                director.World.Layout.Start,director.World.Layout.Goal);
+            var controller = director.Player.GetComponent<CharacterController>();
+            yield return MoveTo(controller,director.World.EntryPosition,4.5f);
+            yield return MoveTo(controller,director.World.CellToWorld(path[Mathf.Min(2,path.Count - 1)]),4.2f);
+            director.CameraRig.TickLook(Vector2.zero,true);
+            yield return new WaitForSecondsRealtime(.5f);
+
+            var pool = FindFirstObjectByType<EnemyPool>();
+            EnemyAgent enemy = null;
+            var elapsed = 0f;
+            var nextSpawn = 0f;
+            var spawned = 0;
+            var initialKills = director.Kills;
+            var sawReload = false;
+            while (elapsed < 25f && !director.Player.Health.IsDead)
+            {
+                elapsed += Time.deltaTime;
+                if (enemy != null && !enemy.IsActive)
+                {
+                    enemy = null;
+                    nextSpawn = elapsed + 2.2f;
+                }
+                if (enemy == null && spawned < 8 && elapsed >= nextSpawn)
+                {
+                    var forward = Quaternion.Euler(0f,director.CameraRig.Yaw,0f) * Vector3.forward;
+                    var right = Quaternion.Euler(0f,director.CameraRig.Yaw,0f) * Vector3.right;
+                    var offset = (spawned % 3 - 1) * 1.1f;
+                    enemy = pool.Spawn(director.Player,director.World,
+                        director.Player.transform.position + forward * 7f + right * offset,
+                        spawned % 3 == 2);
+                    spawned++;
+                }
+
+                if (enemy != null && enemy.IsActive)
+                {
+                    AimAt(enemy.transform.position + Vector3.up);
+                    director.Player.Weapon.Tick(true,true,false);
+                }
+
+                sawReload |= director.Player.Weapon.IsReloading;
+                var strafe = director.Player.transform.right * Mathf.Sin(elapsed * 2.1f) * 2.8f;
+                var retreat = enemy != null && enemy.IsActive
+                    && Vector3.Distance(enemy.transform.position,director.Player.transform.position) < 3.8f
+                        ? -director.Player.transform.forward * 2.2f : Vector3.zero;
+                controller.Move((strafe + retreat) * Time.deltaTime);
+                yield return null;
+            }
+            var defeated = director.Kills - initialKills;
+            if (defeated < 4 || !sawReload || director.Player.Health.IsDead)
+            {
+                Debug.LogError($"FOGBOUND_PORTFOLIO_GUN_FAIL kills={defeated} reload={sawReload} hp={director.Player.Health.Current}");
+                Application.Quit(2);
+                yield return new WaitForSecondsRealtime(999f);
+                yield break;
+            }
+            Debug.Log($"FOGBOUND_PORTFOLIO_GUN_PASS kills={defeated} reload={sawReload} hp={director.Player.Health.Current}");
+            yield return new WaitForSecondsRealtime(2.5f);
+        }
+
+        private static IEnumerator RunBladeCombat()
+        {
+            yield return PrepareLevel(1,WeaponType.LongBlade);
+            var director = GameDirector.Instance;
+            var path = MazePathfinder.FindPath(director.World.Layout,
+                director.World.Layout.Start,director.World.Layout.Goal);
+            var controller = director.Player.GetComponent<CharacterController>();
+            yield return MoveTo(controller,director.World.EntryPosition,4.5f);
+            yield return MoveTo(controller,director.World.CellToWorld(path[Mathf.Min(1,path.Count - 1)]),4.2f);
+            var pool = FindFirstObjectByType<EnemyPool>();
+            var forward = Quaternion.Euler(0f,director.CameraRig.Yaw,0f) * Vector3.forward;
+            var enemy = pool.Spawn(director.Player,director.World,
+                director.Player.transform.position + forward * 2.35f,true);
+            var elapsed = 0f;
+            while (elapsed < 7f)
+            {
+                elapsed += Time.deltaTime;
+                if (enemy == null || !enemy.IsActive)
+                {
+                    forward = Quaternion.Euler(0f,director.CameraRig.Yaw,0f) * Vector3.forward;
+                    enemy = pool.Spawn(director.Player,director.World,
+                        director.Player.transform.position + forward * 2.35f,elapsed > 3f);
+                }
+                AimAt(enemy.transform.position + Vector3.up);
+                director.Player.Weapon.Tick(false,true,false);
+                var separation = enemy.transform.position - director.Player.transform.position;
+                separation.y = 0f;
+                if (separation.magnitude < 1.9f)
+                    controller.Move(-separation.normalized * (2.8f * Time.deltaTime));
+                else if (separation.magnitude > 2.8f)
+                    controller.Move(separation.normalized * (1.6f * Time.deltaTime));
+                yield return null;
+            }
+            yield return new WaitForSecondsRealtime(2f);
+        }
+
+        private static IEnumerator MoveTo(CharacterController controller,Vector3 destination,float speed)
+        {
+            var director = GameDirector.Instance;
+            var timeout = 0f;
+            while (timeout < 5f)
+            {
+                timeout += Time.deltaTime;
+                var delta = destination - director.Player.transform.position;
+                delta.y = 0f;
+                if (delta.magnitude < .12f) yield break;
+                var yaw = Mathf.Atan2(delta.x,delta.z) * Mathf.Rad2Deg;
+                director.CameraRig.TickLook(
+                    new Vector2(Mathf.DeltaAngle(director.CameraRig.Yaw,yaw),0f),false);
+                controller.Move(Vector3.ClampMagnitude(delta,speed * Time.deltaTime));
+                yield return null;
+            }
+        }
+
+        private static void AimAt(Vector3 position)
+        {
+            var director = GameDirector.Instance;
+            var delta = position - director.Player.transform.position;
+            var yaw = Mathf.Atan2(delta.x,delta.z) * Mathf.Rad2Deg;
+            director.CameraRig.TickLook(
+                new Vector2(Mathf.DeltaAngle(director.CameraRig.Yaw,yaw),0f),false);
         }
 
         private static void CaptureFrame(string output)
