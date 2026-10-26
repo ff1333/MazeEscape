@@ -115,6 +115,8 @@ docs/
 
 ## 历史版本
 
+- [从主菜单到十关迷宫的完整代码与开发解释](docs/PROJECT_DEVELOPMENT_EXPLAINED.md)
+
 - [v1.2.2：避难灯与装弹反馈](docs/12_V1_2_2_LIGHTS_AND_RELOAD.md)
 - [v1.2.1：右手武器、命中与遮挡修复](docs/11_V1_2_1_WEAPONS.md)
 - [v1.2.0：关卡图鉴与战斗表现](docs/10_V1_2_0_POLISH.md)
