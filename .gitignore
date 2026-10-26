@@ -11,6 +11,7 @@
 .utmp/
 *.csproj
 *.sln
+*.slnx
 *.suo
 *.user
 *.userprefs

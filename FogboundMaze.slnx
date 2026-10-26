@@ -1,6 +1,0 @@
-﻿<Solution>
-  <Project Path="FogboundMaze.Runtime.csproj" />
-  <Project Path="FogboundMaze.PlayModeTests.csproj" />
-  <Project Path="FogboundMaze.EditModeTests.csproj" />
-  <Project Path="Assembly-CSharp-Editor.csproj" />
-</Solution>
