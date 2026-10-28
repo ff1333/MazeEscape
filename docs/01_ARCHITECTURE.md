@@ -9,7 +9,7 @@
 3. 创建 HUD 与移动端触控层。
 4. 读取 `CampaignProgress`，用第一关作为开始页的场景背景，进入 `Title`。
 5. 点击 START 进入 `LevelSelect`，只有已解锁关卡允许进入。
-6. 选择关卡后生成该关迷宫、预热对象池，进入选武器阶段 `Staging`。
+6. 选择关卡后生成该关迷宫、预热对象池，进入双武器确认阶段 `Staging`。
 
 运行时生成使十关共享同一份代码和场景，关卡差异集中在
 `LevelDefinition`，避免复制场景后参数逐渐失控。
@@ -28,12 +28,12 @@
 | 世界 | `MazeWorld` | 生成碰撞体、门、灯和坐标转换 |
 | 玩家 | `PlayerController` | CharacterController 移动与重力 |
 | 相机 | `CameraRig` | 第一/第三人称切换和墙体避让 |
-| 战斗 | `WeaponController` | Hitscan 手枪、弹匣、近战检测 |
-| AI | `EnemyAgent` | Wander/Chase/Attack/Dead 状态 |
+| 战斗 | `WeaponController` | 双武器切换、Hitscan 冲锋枪、手动换弹、近战检测 |
+| AI | `EnemyPerception`、`EnemyDecisionModel`、`EnemyAgent` | 感知、记忆、Utility 评分与行为执行 |
 | 性能 | `EnemyPool` | 按关卡上限预热并复用敌人 |
-| 环境 | `EnvironmentController` | 雾、光照与昼夜循环 |
+| 环境 | `EnvironmentController`、`MazeWorld` | 固定地下城状态、局部雾区、照明与污染 |
 | 输入 | `GameInput` | Input System 与触控输入统一 |
-| UI | `GameHud`、`GameHud.Campaign` | 开始页、选关、HUD、武器选择、暂停与结算 |
+| UI | `GameHud`、`GameHud.Campaign` | 开始页、选关、双武器 HUD、准备、暂停与结算 |
 | 探索地图 | `MazeExploration`、`MiniMapHud` | 记录已走格子，以小纹理显示路径、朝向和未探索岔路口 |
 
 ## 为什么不用 NavMesh

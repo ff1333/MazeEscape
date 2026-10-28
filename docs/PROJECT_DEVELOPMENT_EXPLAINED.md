@@ -1,8 +1,10 @@
 # 迷宫逃生完整开发解释
 
+> **仓库展示副本**：集中学习主文档位于本机 `项目学习文档/02_迷宫逃生_完整开发解释.md`。本文件用于 GitHub 阅读，并随主文档同步更新。
+
 这是一份持续更新的学习文档，用来解释《迷宫逃生》从主菜单、程序化迷宫、玩家控制、武器战斗到僵尸行为和关卡结算的完整开发过程。
 
-当前主体基于正式版 `v1.3.1`。`v1.4` 不只改敌人 AI，而是把武器、HUD、环境主题和敌人感知统一成“地下城探索与生存”体验，再持续记录感知、记忆、群体警报和 Utility AI 的改造过程。
+当前正式版仍是 `v1.3.1`，功能分支已经完成 `v1.4.0` 发布候选。v1.4 把武器、HUD、环境主题和敌人感知统一成“地下城探索与生存”体验，并完成双武器、手动换弹、视觉与听觉感知、目标记忆、有限群体警报、Utility AI、固定地下城环境和局部雾区。
 
 ## 一、先用一句话理解游戏
 
@@ -11,11 +13,12 @@
 ```text
 进入开始界面
 → 选择已解锁关卡
-→ 选择冲锋枪或长刀
+→ 确认初始手持冲锋枪或长刀
 → 从迷宫外进入入口
 → 探索程序化迷宫
 → 对抗普通和精英僵尸
-→ 应对浓雾、昼夜和瘴气
+→ 随时切换枪刀并控制噪声风险
+→ 应对固定地下城状态、局部雾区和瘴气
 → 找到终点门
 → 解锁下一关
 ```
@@ -25,8 +28,8 @@
 - 3D 角色控制和第一/第三人称相机；
 - 程序化迷宫生成；
 - A* 寻路；
-- 敌人状态机；
-- 枪械和近战；
+- 感知、决策和执行分层的敌人 Utility AI；
+- 双武器切换、手动换弹和枪械/近战反馈；
 - 对象池；
 - 小地图探索；
 - 十关数据配置和本地存档；
@@ -43,8 +46,8 @@
 | 寻路 | `MazePathfinder` | 在逻辑网格上执行 A* |
 | 玩家 | `GameInput`、`PlayerController`、`CameraRig` | 输入、移动、视角、冲刺和角色状态 |
 | 战斗 | `WeaponController`、`Health`、`CombatEffects` | 枪械、近战、伤害、装弹和反馈 |
-| 敌人 | `EnemyPool`、`EnemyAgent`、`SpawnTelegraph` | 生成、复用、移动、攻击和死亡 |
-| 环境 | `EnvironmentController`、`SafeLightLayout` | 浓雾、昼夜、瘴气和安全灯 |
+| 敌人 | `NoiseSystem`、`EnemyPerception`、`EnemyDecisionModel`、`EnemyAgent` | 声音传播、视觉听觉、记忆、Utility 决策和行为执行 |
+| 环境 | `EnvironmentController`、`MazeWorld`、`SafeLightLayout` | 固定地下城状态、局部雾区、瘴气和安全灯 |
 | UI | `GameHud`、`MiniMapHud`、`MobileControls` | 菜单、HUD、小地图和移动端操作 |
 
 总体关系：
@@ -53,10 +56,11 @@
 GameDirector 管理当前关卡和游戏阶段
 ├─ MazeWorld 根据 LevelDefinition 构建迷宫
 ├─ PlayerController 读取 GameInput 并移动
-├─ WeaponController 执行枪械或长刀攻击
+├─ WeaponController 保存双武器弹药并执行枪械或长刀攻击
 ├─ EnemyPool 生成 EnemyAgent
-├─ EnemyAgent 使用 MazeWorld.FindPath 追击
-├─ EnvironmentController 应用关卡环境
+├─ EnemyPerception 收集视觉、声音和最后已知位置
+├─ EnemyDecisionModel 评分后由 EnemyAgent 寻路和执行
+├─ EnvironmentController 应用固定环境，MazeWorld 创建局部雾区
 └─ GameHud 根据 GameDirector 和玩家状态显示界面
 ```
 
@@ -124,18 +128,18 @@ GameDirector.ShowLevelSelection
 - 迷宫宽高；
 - 固定随机种子；
 - 敌人数量和生成节奏；
-- 是否有浓雾；
-- 是否有昼夜变化；
+- 固定 `DungeonCondition`；
+- 局部雾区数量；
 - 是否有瘴气；
 - 是否有精英敌人。
 
-随后调用 `MazeWorld.Build(level)` 构建该关卡，并进入 `Staging` 武器选择阶段。
+随后调用 `MazeWorld.Build(level)` 构建该关卡，并进入 `Staging` 双武器确认阶段。
 
-### 4.4 选择武器
+### 4.4 确认初始手持武器
 
-玩家选择冲锋枪或长刀后，`WeaponController` 切换武器类型和模型。角色仍位于迷宫外的准备区，穿过入口触发器后才正式进入 `Playing`。
+`WeaponController.PrepareLoadout()` 在关卡加载时一次性准备冲锋枪和长刀，并初始化 30 发弹匣与 90 发备用弹药。准备界面只决定进入关卡时先拿枪还是先拿刀，不会移除另一把武器。角色仍位于迷宫外的准备区，穿过入口触发器后才正式进入 `Playing`。
 
-这样把“选完武器”和“开始计时刷怪”分开，玩家可以先观察操作说明和入口方向。
+这样把“确认装备”和“开始计时刷怪”分开，玩家可以先观察操作说明、切换武器和确认入口方向。
 
 ## 五、十关为什么每关迷宫不同
 
@@ -329,11 +333,11 @@ Inactive
 6. 沿路径格子移动；
 7. 攻击时再次使用 Linecast 检查遮挡。
 
-当前不足是它只根据距离发现玩家，隔墙和浓雾不会真正影响“是否发现”，也没有最后已知位置和搜索行为。
+这是 v1.3.1 的旧行为基线。它只根据距离发现玩家，隔墙和浓雾不会真正影响“是否发现”，也没有最后已知位置和搜索行为。
 
-### 11.3 v1.4 改造方向
+### 11.3 v1.4 已实现的感知、决策和执行分层
 
-状态将扩展为：
+状态已经扩展为：
 
 ```text
 Patrol
@@ -341,9 +345,27 @@ Investigate
 Chase
 Search
 Attack
+Dead
 ```
 
-后续增加视觉、听觉、记忆、群体警报和 Utility AI。枪声、长刀攻击声与奔跑脚步声将成为听觉输入；敌人只能获得声音位置或最后已知位置，不能直接获得玩家的实时坐标。详细步骤持续追加到本文件。
+`EnemyPerception` 负责收集事实，不负责移动：它检查玩家距离、水平视野角、墙体 Linecast、环境可见度和局部雾区修正，并保存最后已知位置、声音位置、怀疑度和记忆时间。
+
+`NoiseSystem` 是统一的声音事件总线。冲锋枪、长刀、冲刺脚步和僵尸警报都只广播“声音发生位置、半径和类型”，不会把玩家实时坐标持续交给敌人。普通僵尸警报半径为 12 米，精英为 16 米，并有 4 秒冷却，避免一个敌人看到玩家后让整张地图瞬间全知。
+
+`EnemyDecisionModel` 接收感知快照和距离等上下文，对攻击、追击、调查、搜索、巡逻分别评分。它是无场景依赖的纯决策层，因此可以在 EditMode 中单独验证。`EnemyAgent` 只执行最高分意图，继续复用原来的程序化迷宫 A*、移动、攻击、动画和对象池。
+
+完整调用链：
+
+```text
+玩家开枪 / 挥刀 / 冲刺
+→ NoiseSystem.Emit
+→ 半径内 EnemyPerception 记录声音位置
+→ EnemyDecisionModel.Evaluate 计算候选分数
+→ EnemyAgent 切换 Investigate / Search / Chase / Attack
+→ MazeWorld.FindPath
+→ MazePathfinder.FindPath
+→ 沿逻辑网格移动并在需要时攻击
+```
 
 ## 十二、A* 寻路如何工作
 
@@ -396,11 +418,11 @@ Attack
 
 ### 浓雾
 
-当前 `RenderSettings` 全局指数雾在本项目的短距离迷宫中不够直观，容易表现为单纯降低画面清晰度。v1.4 不再把“加大全屏雾浓度”作为主要难度手段，而采用地下城低照度、局部体积雾或粒子雾区、房间色调差异和手持照明，保证玩家仍能辨认墙体、敌人和出口。雾区也会成为敌人视觉距离的明确修正量，而不是只有画面效果。
+`RenderSettings` 全局指数雾在短距离迷宫中容易表现为单纯降低清晰度，因此 v1.4 改成按关卡种子生成的局部雾区。雾区避开入口和出口，使用世界粒子表达空间位置，并在玩家进入时显示平滑的 HUD 后层雾幕和“局部浓雾”状态。HUD 与准星保持清晰，敌人在雾区内的有效视距乘以 `0.55`，所以表现变化与玩法规则一致。
 
 ### 昼夜
 
-当前关卡持续时间较短，连续昼夜循环难以形成可理解的策略，太阳和环境光变化反而会让地下迷宫主题不统一。v1.4 计划删除局内连续昼夜循环，改为每关固定的地下城环境状态，例如供电正常、局部断电、应急红灯或深层黑暗。关卡状态从开始到结束保持稳定，玩家可以据此做路线和战斗判断。
+当前关卡持续时间较短，连续昼夜循环难以形成可理解的策略，太阳和环境光变化反而会让地下迷宫主题不统一。v1.4 已删除局内连续昼夜循环，改为 `Powered / Dim / Emergency / Blackout / Contaminated / Lockdown / DeepCore` 七类固定地下城状态。状态从关卡开始到结束保持稳定，玩家可以据此判断照明、污染和战斗风险。
 
 ### 瘴气
 
@@ -412,7 +434,7 @@ Attack
 
 ### 地下城分区机制
 
-v1.4 建议把十关统一解释成逐层深入地下设施，而不是在短时间内经历昼夜变化。关卡中的难度来自空间和系统状态：
+v1.4 已把十关统一解释成逐层深入地下设施，而不是在短时间内经历昼夜变化。关卡中的难度来自空间和系统状态：
 
 - 入口区：照明稳定，用于确认武器切换、换弹和操作；
 - 探索区：多分岔、资源点和可选支路，强调小地图与路径记忆；
@@ -481,7 +503,7 @@ MazeExitTrigger
 
 ## 十八、测试为什么分 EditMode 和 PlayMode
 
-### EditMode `15/15`
+### v1.4 EditMode `21/21`
 
 适合验证不需要真实运行场景的纯逻辑：
 
@@ -490,17 +512,23 @@ MazeExitTrigger
 - 路线长度和复杂度；
 - 安全灯布局；
 - A* 路径结果。
+- Utility AI 在攻击、追击、调查、搜索和巡逻之间的评分边界；
+- 十关 `DungeonCondition` 和局部雾区配置。
 
-### PlayMode `35/35`
+### v1.4 PlayMode `39/39`
 
 适合验证需要场景和组件生命周期的行为：
 
-- 开始页、选关和武器选择；
+- 开始页、选关和双武器准备；
 - 角色和入口碰撞；
 - 枪械、长刀和装弹；
 - 敌人对象池复用；
 - 设置保存；
 - 胜负和关卡解锁。
+- 视野角、墙体遮挡、声音调查和有限警报；
+- 对象池回收后清空感知记忆；
+- 空弹不自动换弹、备用弹药转移和切刀中断换弹；
+- 固定地下城状态和局部雾区回归。
 
 自动测试用于防止版本迭代破坏规则，不能代替真实玩家对难度和手感的判断。
 
@@ -516,25 +544,23 @@ MazeExitTrigger
 → MazeWorld.Build
 → MazeGenerator 生成 MazeLayout
 → MazeWorld 创建地面、墙、入口、出口和灯
-→ 选择武器
+→ 确认初始手持武器
 → 进入 Entry Trigger
 → GameDirector.BeginRun
 ```
 
-### 示例二 僵尸追击玩家
+### 示例二 僵尸听到枪声后调查并追击
 
 ```text
-关卡刷怪逻辑
-→ SpawnTelegraph
-→ EnemyPool.Spawn
-→ EnemyAgent.Spawn
-→ EnemyAgent.Update
-→ MazeWorld.FindPath
-→ MazePathfinder.FindPath
-→ CharacterController.SimpleMove
-→ 进入攻击距离
-→ Linecast 检查遮挡
-→ Player.Health.Damage
+WeaponController.FireGun
+→ NoiseSystem.Emit(Gunshot, 30 米)
+→ EnemyPerception.OnNoise 记录声音位置
+→ EnemyDecisionModel 选择 Investigate
+→ EnemyAgent 使用 MazeWorld.FindPath 前往声音位置
+→ 进入视野角且 Linecast 无墙体遮挡
+→ EnemyPerception 更新最后已知位置
+→ EnemyDecisionModel 选择 Chase / Attack
+→ EnemyAgent 寻路、移动并按攻击节奏造成伤害
 ```
 
 ### 示例三 玩家用冲锋枪击杀僵尸
@@ -542,7 +568,7 @@ MazeExitTrigger
 ```text
 GameInput.AttackHeld
 → PlayerController 调用 WeaponController.Tick
-→ 检查弹匣、装弹和冷却
+→ 检查当前武器、弹匣、手动装弹和冷却
 → 相机射线确定目标点
 → 枪口射线检查遮挡
 → EnemyAgent.TakeDamage
@@ -562,14 +588,13 @@ GameInput.AttackHeld
 
 ## 二十一、项目当前不足
 
-- 敌人发现玩家主要依赖距离；
-- 没有视觉锥、听觉和目标记忆；
-- 敌人之间没有有限通信；
-- 敌人行为规则集中在 `EnemyAgent`；
+- Utility AI 仍是人工配置的可解释规则，不是机器学习模型；
+- 备用弹药暂时没有场景拾取补给，耗尽后必须使用长刀；
+- 局部雾粒子在不同图形设备上的可见度可能存在差异，因此 HUD 雾幕承担稳定反馈；
 - 没有联网、热更新和商业存档；
 - 真机测试次数和设备覆盖有限。
 
-这些不足不是隐藏项，而是 v1.4 敌人 AI 改造的出发点。
+这些不足用于界定作品集范围。v1.4 已解决隔墙全知、声音无意义、短局昼夜和武器二选一的问题，但仍需要作者真人试玩决定数值和手感是否达到正式发布标准。
 
 ## 二十二、v1.4 更新记录入口
 
@@ -579,22 +604,33 @@ v1.4 的较大系统不得脱离参考直接编写。每一步开始前先查看
 
 每个步骤的开发记录必须包含：来源、许可证、参考点、适配方案和未采用部分。许可证不明的代码不复制；即使许可证允许，也不整段照搬与项目结构不相符的实现。
 
-### 第一步 状态骨架
+### 已完成记录
 
-目标：把旧的 `Wander / Chase / Attack` 扩展为语义明确的 `Patrol / Investigate / Chase / Search / Attack`，统一通过 `SetState` 切换，并保持现有玩法不变。
+- 设计与参考：[`V1_4_STEP_01_ENEMY_STATE_SKELETON.md`](V1_4_STEP_01_ENEMY_STATE_SKELETON.md)
+- 完整开发日志：[`11-v1.4.0-dungeon-ai-and-loadout.md`](devlogs/11-v1.4.0-dungeon-ai-and-loadout.md)
+- 候选版说明：[`RELEASE_NOTES_v1.4.0.md`](RELEASE_NOTES_v1.4.0.md)
 
-详细教程：[`V1_4_STEP_01_ENEMY_STATE_SKELETON.md`](V1_4_STEP_01_ENEMY_STATE_SKELETON.md)
+### 自动验证结果
 
-后续每完成一个步骤，都在本节增加：
+- EditMode：`21/21 PASS`；
+- PlayMode：`39/39 PASS`；
+- Windows Development：构建成功，`0 errors / 0 warnings`；
+- 独立 Player：双武器准备、第一人称 HUD、深层地下环境和局部雾幕截图通过检查。
 
-- 需求；
-- 玩家可见变化；
-- 参考的官方或开源方案；
-- 修改的脚本；
-- 调用链；
-- 测试结果；
-- 已知限制；
-- 面试讲法。
+仓库证据索引：[`docs/test-results/v1.4.0/README.md`](test-results/v1.4.0/README.md)。
+
+### 尚未完成的发布步骤
+
+- 作者真人完整试玩和难度调平；
+- v1.4.0 Android 构建与真机验收；
+- WebGL 和正式 Windows 非 Development 构建；
+- GitHub PR 合并、`v1.4.0` 标签和 Release。
+
+自动测试能证明规则和回归状态，不能代替真人对战斗节奏、换弹压力、雾区可读性和移动手感的判断。
+
+### 面试讲法
+
+> v1.4 我没有继续把敌人判断堆进 EnemyAgent，而是拆成 NoiseSystem、EnemyPerception、EnemyDecisionModel 和 EnemyAgent 四层。声音系统只广播位置和半径，感知层保存视觉、听觉和最后已知位置，纯逻辑决策层使用可测试的 Utility 分数选择意图，执行层继续复用程序化迷宫 A* 和对象池。这样解决了隔墙全知，也让我能单独测试决策边界。武器方面改为枪刀常驻、手动换弹和备用弹药，环境方面删除短局昼夜，改成固定地下城状态和会同步影响敌人视野的局部雾区。
 
 ## 二十三、以后如何使用这份文档
 
