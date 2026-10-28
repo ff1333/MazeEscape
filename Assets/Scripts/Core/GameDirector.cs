@@ -39,6 +39,8 @@ namespace FogboundMaze
         public int EnemyPoolCapacity => pool.Capacity;
         public bool LoadoutConfirmed { get; private set; }
         public float EnemyVisionMultiplier => environment != null ? environment.EnemyVisionMultiplier : 1f;
+        public float EnemyVisionMultiplierAt(Vector3 position) => EnemyVisionMultiplier * world.LocalVisibilityMultiplier(position);
+        public bool IsPlayerInFog => world != null && player != null && world.IsInsideFogZone(player.transform.position);
 
         private void Awake()
         {

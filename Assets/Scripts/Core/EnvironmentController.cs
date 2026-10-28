@@ -4,50 +4,63 @@ namespace FogboundMaze
 {
     public sealed class EnvironmentController : MonoBehaviour
     {
-        private Light sun;
-        private LevelDefinition level;
-        private float cycle;
+        private Light overhead;
         public float EnemyVisionMultiplier { get; private set; } = 1f;
 
         private void Awake()
         {
-            sun = new GameObject("Directional Light").AddComponent<Light>();
-            sun.type = LightType.Directional;
-            sun.color = new Color(1f, 0.88f, 0.72f);
-            sun.intensity = 1.15f;
-            sun.shadows = LightShadows.Soft;
+            overhead = new GameObject("Dungeon Ambient Light").AddComponent<Light>();
+            overhead.type = LightType.Directional;
+            overhead.shadows = LightShadows.Soft;
+            overhead.transform.rotation = Quaternion.Euler(70f, 25f, 0f);
         }
 
         public void Apply(LevelDefinition definition)
         {
-            level = definition;
-            cycle = 0.18f;
             var sky = Resources.Load<Material>("FogboundSky");
             if (sky != null) RenderSettings.skybox = sky;
-            RenderSettings.fog = definition.fogDensity > 0.01f;
+
+            var ambient = new Color(.16f,.19f,.19f);
+            var lightColor = new Color(.78f,.86f,.82f);
+            var intensity = .55f;
+            var fogColor = new Color(.10f,.14f,.14f);
+            var conditionMultiplier = 1f;
+            switch (definition.environment)
+            {
+                case DungeonCondition.Dim:
+                    ambient = new Color(.10f,.13f,.14f); intensity = .34f; conditionMultiplier = .88f;
+                    break;
+                case DungeonCondition.Emergency:
+                    ambient = new Color(.14f,.075f,.06f); lightColor = new Color(1f,.34f,.20f); intensity = .38f;
+                    fogColor = new Color(.18f,.08f,.065f); conditionMultiplier = .82f;
+                    break;
+                case DungeonCondition.Blackout:
+                    ambient = new Color(.035f,.045f,.05f); intensity = .08f; conditionMultiplier = .68f;
+                    break;
+                case DungeonCondition.Contaminated:
+                    ambient = new Color(.07f,.12f,.085f); lightColor = new Color(.55f,1f,.62f); intensity = .26f;
+                    fogColor = new Color(.09f,.16f,.10f); conditionMultiplier = .70f;
+                    break;
+                case DungeonCondition.Lockdown:
+                    ambient = new Color(.10f,.045f,.045f); lightColor = new Color(1f,.20f,.16f); intensity = .25f;
+                    fogColor = new Color(.16f,.055f,.05f); conditionMultiplier = .62f;
+                    break;
+                case DungeonCondition.DeepCore:
+                    ambient = new Color(.03f,.05f,.055f); lightColor = new Color(.30f,.72f,.68f); intensity = .12f;
+                    fogColor = new Color(.055f,.10f,.105f); conditionMultiplier = .55f;
+                    break;
+            }
+
+            overhead.color = lightColor;
+            overhead.intensity = intensity;
+            RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
+            RenderSettings.ambientLight = ambient;
+            RenderSettings.fog = definition.fogDensity > .001f;
             RenderSettings.fogMode = FogMode.ExponentialSquared;
             RenderSettings.fogDensity = definition.fogDensity;
-            EnemyVisionMultiplier = Mathf.Lerp(1f, .52f, Mathf.InverseLerp(.002f, .038f, definition.fogDensity));
-            RenderSettings.fogColor = new Color(0.12f, 0.16f, 0.17f);
-            RenderSettings.ambientLight = new Color(0.2f, 0.24f, 0.25f);
-            UpdateLighting();
-        }
-
-        private void Update()
-        {
-            if (level == null || !level.dayNightCycle || GameDirector.Instance?.Phase != GamePhase.Playing) return;
-            cycle = Mathf.Repeat(cycle + Time.deltaTime / level.dayDuration, 1f);
-            UpdateLighting();
-        }
-
-        private void UpdateLighting()
-        {
-            var daylight = level != null && level.dayNightCycle
-                ? Mathf.Clamp01(Mathf.Sin(cycle * Mathf.PI * 2f) * 0.55f + 0.5f)
-                : 1f;
-            sun.transform.rotation = Quaternion.Euler(cycle * 360f - 90f, 28f, 0f);
-            sun.intensity = Mathf.Lerp(0.2f, 1.25f, daylight);
-            RenderSettings.ambientLight = Color.Lerp(new Color(0.075f, 0.09f, 0.1f), new Color(0.32f, 0.34f, 0.31f), daylight);
+            RenderSettings.fogColor = fogColor;
+            var densityMultiplier = Mathf.Lerp(1f, .78f, Mathf.InverseLerp(.002f, .018f, definition.fogDensity));
+            EnemyVisionMultiplier = conditionMultiplier * densityMultiplier;
         }
     }
 }

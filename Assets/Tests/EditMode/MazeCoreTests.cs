@@ -120,9 +120,9 @@ namespace FogboundMaze.Tests
                 }
             }
 
-            Assert.That(levels[3].fogDensity, Is.GreaterThan(0.01f));
+            Assert.That(levels[3].localFogZones, Is.GreaterThan(0));
             Assert.That(levels[4].eliteChance, Is.GreaterThan(0f));
-            Assert.That(levels[5].dayNightCycle, Is.True);
+            Assert.That(levels[5].environment, Is.EqualTo(DungeonCondition.Blackout));
             Assert.That(levels[6].miasma, Is.True);
         }
 

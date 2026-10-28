@@ -14,13 +14,13 @@ namespace FogboundMaze
         {
             1 => "THE FIRST EXIT\nLearn the corridors. Ordinary zombies follow the maze paths. Reach the exit alive.",
             2 => "MORE CROSSROADS\nA larger maze and more dead ends. The map remembers where you have walked.",
-            3 => "GROWING PURSUIT\nMore zombies and faster reinforcements. Keep moving and check your ammunition.",
-            4 => "DENSE FOG\nFog now limits distant visibility. Use nearby landmarks and your explored map.",
-            5 => "HEAVY ELITES\nLarge purple zombies join the hunt. They have more health, move faster and hit harder.",
-            6 => "DAY AND NIGHT\nLight changes during the run. Your flashlight remains available through the night.",
-            7 => "MIASMA AND SAFE LIGHTS\nMiasma drains health outside safe lights. Lamps also stand in side routes and dead ends; they do not mark the exit.",
-            8 => "DEEP ZONE\nFog, elites, night and miasma combine. Longer routes and tighter safe zones raise the pressure.",
-            9 => "LOCKDOWN\nMore frequent enemies and more elites. Retrace explored paths when a route becomes unsafe.",
+            3 => "NOISE DISCIPLINE\nGunfire reaches farther than the blade. Switch weapons to control how many zombies investigate.",
+            4 => "LOCAL FOG\nVisible fog pockets reduce both player awareness and zombie sight. Use the explored map to cross them.",
+            5 => "RED ALERT\nEmergency lighting and elite zombies increase pressure without changing during the short run.",
+            6 => "BLACKOUT\nMost fixed lights are offline. Use the flashlight, quieter attacks and remembered corridors.",
+            7 => "CONTAMINATION\nMiasma drains health outside safe lights. Lamps also stand in side routes and dead ends.",
+            8 => "DEEP ZONE\nFog pockets, elites and contamination combine while the environment remains consistently readable.",
+            9 => "LOCKDOWN\nRed warning lights, frequent enemies and group alerts make noisy routes dangerous.",
             _ => "THE LAST EXIT\nThe largest maze and strongest combined pressure. Clear this exit to finish the campaign."
         };
 
@@ -59,7 +59,7 @@ namespace FogboundMaze
             guideTitle.text = $"{number:00}  /  {brief[0]}";
             guideBody.text = brief[1] + $"\n\nMAZE  {level.width} x {level.height}     ENEMIES  {level.maxEnemies} MAX"
                 + $"\nSPAWN INTERVAL  {level.spawnInterval:0.0}s     ELITE CHANCE  {level.eliteChance:P0}"
-                + $"\n\nFOG  {(level.fogDensity > .01f ? "ACTIVE" : "CLEAR")}     DAY / NIGHT  {(level.dayNightCycle ? "ACTIVE" : "OFF")}"
+                + $"\n\nCONDITION  {ConditionLabel(level.environment)}     FOG ZONES  {level.localFogZones}"
                 + (level.miasma ? $"\nMIASMA  {level.miasmaDamagePerSecond:0.0} HP/s     SAFE RADIUS  {level.safeLightRadius:0.0}m" : "\nMIASMA  OFF")
                 + "\n\nClear the previous level to unlock the next. Replaying a cleared level keeps your progress.";
             for (var i = 0; i < guideTabs.Length; i++)

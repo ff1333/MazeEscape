@@ -23,7 +23,7 @@ namespace FogboundMaze.Tests
                 GameDirector.Instance.Hud.transform.Find("Field Guide/Chapter 7").GetComponent<Button>().onClick.Invoke();
                 foreach(var label in GameDirector.Instance.Hud.GetComponentsInChildren<LocalizedLabel>()) label.Refresh();
                 var guideText=string.Join("\n",System.Array.ConvertAll(GameDirector.Instance.Hud.GetComponentsInChildren<Text>(),label=>label.text));
-                Assert.That(guideText,Does.Contain("瘴气与避难灯"));
+                Assert.That(guideText,Does.Contain("污染区域"));
                 Assert.That(guideText,Does.Not.Contain("Miasma drains"));
                 PortfolioSettingsMenu.Instance.Open();Assert.That(PortfolioSettings.IsOpen,Is.True);
                 PortfolioSettings.SetLanguage(false);title.GetComponent<LocalizedLabel>().Refresh();Assert.That(title.text,Is.EqualTo("MAZE\nESCAPE"));

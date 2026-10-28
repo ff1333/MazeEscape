@@ -423,6 +423,9 @@ namespace FogboundMaze.Tests
             Assert.That(director.World.Layout.Height, Is.EqualTo(14));
             Assert.That(director.CurrentLevel.miasma, Is.True);
             Assert.That(director.World.SafeLights, Is.Not.Empty);
+            Assert.That(director.CurrentLevel.environment, Is.EqualTo(DungeonCondition.DeepCore));
+            Assert.That(director.World.FogZones.Count, Is.EqualTo(8));
+            Assert.That(director.World.LocalVisibilityMultiplier(director.World.FogZones[0]), Is.EqualTo(.55f));
             Assert.That(director.EnemyPoolCapacity, Is.GreaterThanOrEqualTo(14));
             director.SelectWeapon(WeaponType.SubmachineGun);
             director.BeginRun();

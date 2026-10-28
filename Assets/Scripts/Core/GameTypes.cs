@@ -19,6 +19,17 @@ namespace FogboundMaze
         Lost
     }
 
+    public enum DungeonCondition
+    {
+        Powered,
+        Dim,
+        Emergency,
+        Blackout,
+        Contaminated,
+        Lockdown,
+        DeepCore
+    }
+
     public enum EnemyState
     {
         Inactive,

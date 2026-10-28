@@ -24,6 +24,7 @@ namespace FogboundMaze
             var guide = System.Array.Exists(arguments, value => value == "-fogboundGuide");
             var combat = System.Array.Exists(arguments, value => value == "-fogboundCombat");
             var reload = System.Array.Exists(arguments, value => value == "-fogboundReload");
+            var fogZone = System.Array.Exists(arguments, value => value == "-fogboundFogZone");
             var levelNumber = int.TryParse(ReadArgument(arguments, "-fogboundLevel"), out var requestedLevel)
                 ? Mathf.Clamp(requestedLevel, 1, 10) : 1;
             yield return new WaitForSecondsRealtime(1f);
@@ -135,6 +136,12 @@ namespace FogboundMaze
                         yield return null;
                         yield return null;
                     }
+                }
+                if (fogZone && director.World.FogZones.Count > 0)
+                {
+                    director.Player.Teleport(director.World.FogZones[0] + Vector3.up * .2f);
+                    yield return null;
+                    yield return new WaitForSecondsRealtime(1.5f);
                 }
                 yield return new WaitForSecondsRealtime(2.5f);
             }
@@ -344,7 +351,11 @@ namespace FogboundMaze
                 if (enemy != null && enemy.IsActive)
                 {
                     AimAt(enemy.transform.position + Vector3.up);
-                    director.Player.Weapon.Tick(true,true,false);
+                    var weapon = director.Player.Weapon;
+                    if (weapon.Ammunition <= 3 && !weapon.IsReloading)
+                        weapon.Tick(false,false,true);
+                    else
+                        weapon.Tick(true,true,false);
                 }
 
                 sawReload |= director.Player.Weapon.IsReloading;

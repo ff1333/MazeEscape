@@ -88,7 +88,7 @@ namespace FogboundMaze
                 return;
             if (Time.time < staggerUntil) return;
 
-            perception.Tick(GameDirector.Instance.EnemyVisionMultiplier);
+            perception.Tick(GameDirector.Instance.EnemyVisionMultiplierAt(transform.position));
             if (perception.CanSeePlayer && !hadDirectSight && Time.time >= nextAlert)
             {
                 nextAlert = Time.time + 4f;

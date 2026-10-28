@@ -47,6 +47,9 @@ namespace FogboundMaze
         private Text weaponStateText;
         private Image reloadFill;
         private GameObject weaponHud;
+        private Image fogWash;
+        private Image fogVignette;
+        private Texture2D fogVignetteTexture;
 
         public int ExploredCells => miniMap?.VisitedCount ?? 0;
 
@@ -73,6 +76,7 @@ namespace FogboundMaze
                 foreach (var part in crosshairParts)
                     part.color = crosshairFlash > 0f ? Accent : Ink;
             }
+            RefreshFogOverlay();
         }
 
         public void Refresh(GameDirector director, PlayerController player)
@@ -82,10 +86,11 @@ namespace FogboundMaze
             timerText.text = TimeSpan.FromSeconds(director.Elapsed).ToString(@"mm\:ss");
             killsText.text = $"KILLS  {director.Kills:000}";
             RefreshWeaponHud(player.Weapon);
-            statusText.text = director.CurrentLevel.miasma
-                ? (director.IsPlayerSafe ? "LIGHT SAFE" : "MIASMA EXPOSED")
-                : string.Empty;
-            statusText.color = director.IsPlayerSafe ? Accent : Warning;
+            statusText.text = director.CurrentLevel.miasma && !director.IsPlayerSafe ? "MIASMA EXPOSED"
+                : director.IsPlayerInFog ? "LOCAL FOG"
+                : ConditionLabel(director.CurrentLevel.environment);
+            statusText.color = director.CurrentLevel.miasma && !director.IsPlayerSafe || director.IsPlayerInFog
+                ? Warning : Accent;
         }
 
         public void BindHealth(Health health)
@@ -109,6 +114,8 @@ namespace FogboundMaze
         private void OnDestroy()
         {
             if (observedHealth != null) observedHealth.Changed -= RefreshHealth;
+            if (fogVignette != null && fogVignette.sprite != null) Destroy(fogVignette.sprite);
+            if (fogVignetteTexture != null) Destroy(fogVignetteTexture);
         }
 
         public void ShowWeaponSelection(int level)
@@ -182,6 +189,15 @@ namespace FogboundMaze
         }
         public void PulseShot() => shotPulse = 1f;
 
+        private static string ConditionLabel(DungeonCondition condition) => condition switch
+        {
+            DungeonCondition.Dim => "DIM LIGHTS",
+            DungeonCondition.Emergency => "RED ALERT",
+            DungeonCondition.Contaminated => "CONTAMINATED",
+            DungeonCondition.DeepCore => "DEEP CORE",
+            _ => condition.ToString().ToUpperInvariant()
+        };
+
         private void Build()
         {
             font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
@@ -195,6 +211,7 @@ namespace FogboundMaze
             gameObject.AddComponent<GraphicRaycaster>();
             EnsureEventSystem();
 
+            BuildFogOverlay();
             BuildTopBar();
             BuildWeaponHud();
             miniMap = MiniMapHud.Create(transform, font);
@@ -237,6 +254,52 @@ namespace FogboundMaze
             SetRect(levelText.rectTransform, new Vector2(0.77f, 0f), new Vector2(0.84f, 1f));
             killsText = Label("Kills", bar.transform, "KILLS  000", 23, TextAnchor.MiddleCenter);
             SetRect(killsText.rectTransform, new Vector2(0.85f, 0f), new Vector2(0.97f, 1f));
+        }
+
+        private void BuildFogOverlay()
+        {
+            fogWash = PanelObject("Fog Wash",transform,Color.clear).GetComponent<Image>();
+            SetRect(fogWash.rectTransform,Vector2.zero,Vector2.one);
+            fogWash.raycastTarget = false;
+            fogVignette = PanelObject("Fog Vignette",transform,Color.clear).GetComponent<Image>();
+            SetRect(fogVignette.rectTransform,Vector2.zero,Vector2.one);
+            fogVignette.raycastTarget = false;
+            fogVignette.sprite = CreateFogVignetteSprite();
+            fogVignette.preserveAspect = false;
+            fogVignette.transform.SetAsFirstSibling();
+            fogWash.transform.SetAsFirstSibling();
+        }
+
+        private Sprite CreateFogVignetteSprite()
+        {
+            const int size = 64;
+            fogVignetteTexture = new Texture2D(size,size,TextureFormat.RGBA32,false)
+            {
+                name = "Runtime Fog Vignette",
+                wrapMode = TextureWrapMode.Clamp,
+                filterMode = FilterMode.Bilinear
+            };
+            var pixels = new Color[size * size];
+            for (var y = 0; y < size; y++)
+            for (var x = 0; x < size; x++)
+            {
+                var nx = Mathf.Abs((x + .5f) / size - .5f) * 2f;
+                var ny = Mathf.Abs((y + .5f) / size - .5f) * 2f;
+                var alpha = Mathf.SmoothStep(0f,1f,Mathf.InverseLerp(.48f,1f,Mathf.Max(nx,ny)));
+                pixels[y * size + x] = new Color(1f,1f,1f,alpha);
+            }
+            fogVignetteTexture.SetPixels(pixels);
+            fogVignetteTexture.Apply(false,true);
+            return Sprite.Create(fogVignetteTexture,new Rect(0,0,size,size),Vector2.one * .5f,100f);
+        }
+
+        private void RefreshFogOverlay()
+        {
+            var active = GameDirector.Instance != null && GameDirector.Instance.Phase == GamePhase.Playing
+                && GameDirector.Instance.IsPlayerInFog;
+            var pulse = active ? .015f * (Mathf.Sin(Time.unscaledTime * 1.7f) * .5f + .5f) : 0f;
+            fogWash.color = active ? new Color(.45f,.58f,.56f,.10f + pulse) : Color.clear;
+            fogVignette.color = active ? new Color(.34f,.48f,.46f,.42f + pulse) : Color.clear;
         }
 
         private void BuildWeaponHud()

@@ -20,8 +20,8 @@ namespace FogboundMaze
         [Min(0.5f)] public float spawnInterval;
         [Range(0f, 1f)] public float eliteChance;
         [Range(0f, 0.08f)] public float fogDensity;
-        public bool dayNightCycle;
-        [Min(20f)] public float dayDuration;
+        public DungeonCondition environment;
+        [Range(0, 12)] public int localFogZones;
         public bool miasma;
         [Min(0f)] public float miasmaDamagePerSecond;
         [Min(2f)] public float safeLightRadius;
@@ -51,16 +51,16 @@ namespace FogboundMaze
         {
             return new[]
             {
-                Make(1, 7, 7, 1101, 96, 17, 4, 6.0f, 0.00f, 0.002f, false, false),
-                Make(2, 8, 8, 2203, 128, 21, 5, 5.4f, 0.00f, 0.004f, false, false),
-                Make(3, 9, 9, 3307, 160, 25, 6, 4.9f, 0.00f, 0.007f, false, false),
-                Make(4, 10, 10, 4409, 192, 29, 7, 4.4f, 0.00f, 0.016f, false, false),
-                Make(5, 11, 10, 5513, 240, 32, 8, 4.0f, 0.14f, 0.020f, false, false),
-                Make(6, 11, 11, 6619, 288, 35, 9, 3.7f, 0.18f, 0.023f, true, false),
-                Make(7, 12, 11, 7723, 320, 38, 10, 3.4f, 0.22f, 0.026f, true, true),
-                Make(8, 13, 12, 8837, 384, 42, 11, 3.1f, 0.26f, 0.030f, true, true),
-                Make(9, 14, 13, 9941, 448, 46, 12, 2.8f, 0.31f, 0.034f, true, true),
-                Make(10, 15, 14, 10151, 512, 50, 14, 2.5f, 0.38f, 0.038f, true, true)
+                Make(1, 7, 7, 1101, 96, 17, 4, 6.0f, 0.00f, 0.002f, DungeonCondition.Powered, 0, false),
+                Make(2, 8, 8, 2203, 128, 21, 5, 5.4f, 0.00f, 0.003f, DungeonCondition.Powered, 0, false),
+                Make(3, 9, 9, 3307, 160, 25, 6, 4.9f, 0.00f, 0.005f, DungeonCondition.Dim, 1, false),
+                Make(4, 10, 10, 4409, 192, 29, 7, 4.4f, 0.00f, 0.007f, DungeonCondition.Dim, 3, false),
+                Make(5, 11, 10, 5513, 240, 32, 8, 4.0f, 0.14f, 0.009f, DungeonCondition.Emergency, 3, false),
+                Make(6, 11, 11, 6619, 288, 35, 9, 3.7f, 0.18f, 0.010f, DungeonCondition.Blackout, 4, false),
+                Make(7, 12, 11, 7723, 320, 38, 10, 3.4f, 0.22f, 0.012f, DungeonCondition.Contaminated, 4, true),
+                Make(8, 13, 12, 8837, 384, 42, 11, 3.1f, 0.26f, 0.014f, DungeonCondition.Contaminated, 6, true),
+                Make(9, 14, 13, 9941, 448, 46, 12, 2.8f, 0.31f, 0.016f, DungeonCondition.Lockdown, 6, true),
+                Make(10, 15, 14, 10151, 512, 50, 14, 2.5f, 0.38f, 0.018f, DungeonCondition.DeepCore, 8, true)
             };
         }
 
@@ -75,7 +75,8 @@ namespace FogboundMaze
             float spawnInterval,
             float eliteChance,
             float fogDensity,
-            bool dayNight,
+            DungeonCondition environment,
+            int localFogZones,
             bool miasma)
         {
             return new LevelDefinition
@@ -93,8 +94,8 @@ namespace FogboundMaze
                 spawnInterval = spawnInterval,
                 eliteChance = eliteChance,
                 fogDensity = fogDensity,
-                dayNightCycle = dayNight,
-                dayDuration = Mathf.Lerp(130f, 75f, (number - 1) / 9f),
+                environment = environment,
+                localFogZones = localFogZones,
                 miasma = miasma,
                 miasmaDamagePerSecond = miasma ? Mathf.Lerp(4f, 8f, (number - 7) / 3f) : 0f,
                 safeLightRadius = miasma ? Mathf.Lerp(7f, 6.25f, (number - 7) / 3f) : 7f
