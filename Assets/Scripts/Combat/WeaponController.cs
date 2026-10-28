@@ -135,6 +135,7 @@ namespace FogboundMaze
                 nextAttack = Time.time + .72f;
                 owner.GetComponent<PlayerVisual>()?.Attack();
                 audioSource.PlayOneShot(ProceduralAudio.Machete);
+                NoiseSystem.Emit(transform.position, 7f, NoiseKind.Blade, owner);
                 StartCoroutine(Swing());
             }
         }
@@ -173,6 +174,7 @@ namespace FogboundMaze
             if (!blocked) CombatEffects.Muzzle(muzzle, viewCamera.transform);
             GameDirector.Instance?.Hud?.PulseShot();
             audioSource.PlayOneShot(ProceduralAudio.SubmachineGun, .7f);
+            NoiseSystem.Emit(transform.position, 30f, NoiseKind.Gunshot, owner);
         }
 
         private void ApplyHit(EnemyAgent enemy, float damage)

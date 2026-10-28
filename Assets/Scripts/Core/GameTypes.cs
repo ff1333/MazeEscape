@@ -22,8 +22,10 @@ namespace FogboundMaze
     public enum EnemyState
     {
         Inactive,
-        Wander,
+        Patrol,
+        Investigate,
         Chase,
+        Search,
         Attack,
         Dead
     }

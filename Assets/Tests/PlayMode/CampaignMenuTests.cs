@@ -215,7 +215,7 @@ namespace FogboundMaze.Tests
             var reused = pool.Spawn(game.Player, game.World, game.World.EntryPosition, true);
             Assert.That(reused, Is.SameAs(enemy));
             Assert.That(reused.GetComponent<CharacterController>().enabled, Is.True);
-            Assert.That(reused.State, Is.EqualTo(EnemyState.Wander));
+            Assert.That(reused.State, Is.EqualTo(EnemyState.Patrol));
             Assert.That(reused.transform.Find("Elite Visual").gameObject.activeSelf, Is.True);
             Assert.That(reused.transform.Find("Normal Visual").gameObject.activeSelf, Is.False);
             Assert.That(reused.GetComponent<Health>().Current, Is.EqualTo(125f));

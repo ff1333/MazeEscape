@@ -10,6 +10,7 @@ namespace FogboundMaze
         private CameraRig cameraRig;
         private float verticalSpeed;
         private Vector3 lastGroundedPosition;
+        private float nextFootstepNoise;
 
         public Health Health { get; private set; }
         public WeaponController Weapon { get; private set; }
@@ -64,6 +65,13 @@ namespace FogboundMaze
                 Vector3.down, out var ground, 0.5f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore)
                 && ground.normal.y > 0.9f)
                 lastGroundedPosition = transform.position;
+
+            if (input.SprintHeld && direction.sqrMagnitude > .1f && controller.isGrounded
+                && GameDirector.Instance.Phase == GamePhase.Playing && Time.time >= nextFootstepNoise)
+            {
+                nextFootstepNoise = Time.time + .48f;
+                NoiseSystem.Emit(transform.position, 10f, NoiseKind.Sprint, this);
+            }
 
             if (input.SelectGunPressed) Weapon.Equip(WeaponType.SubmachineGun);
             if (input.SelectBladePressed) Weapon.Equip(WeaponType.LongBlade);

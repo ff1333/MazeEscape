@@ -7,6 +7,7 @@ namespace FogboundMaze
         private Light sun;
         private LevelDefinition level;
         private float cycle;
+        public float EnemyVisionMultiplier { get; private set; } = 1f;
 
         private void Awake()
         {
@@ -26,6 +27,7 @@ namespace FogboundMaze
             RenderSettings.fog = definition.fogDensity > 0.01f;
             RenderSettings.fogMode = FogMode.ExponentialSquared;
             RenderSettings.fogDensity = definition.fogDensity;
+            EnemyVisionMultiplier = Mathf.Lerp(1f, .52f, Mathf.InverseLerp(.002f, .038f, definition.fogDensity));
             RenderSettings.fogColor = new Color(0.12f, 0.16f, 0.17f);
             RenderSettings.ambientLight = new Color(0.2f, 0.24f, 0.25f);
             UpdateLighting();
