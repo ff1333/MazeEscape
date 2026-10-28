@@ -37,6 +37,7 @@ namespace FogboundMaze
         public bool IsPlayerSafe => !level.miasma || world.IsWithinSafeLight(player.transform.position, level.safeLightRadius);
         public int ActiveEnemyCount => pool.ActiveCount;
         public int EnemyPoolCapacity => pool.Capacity;
+        public bool LoadoutConfirmed { get; private set; }
 
         private void Awake()
         {
@@ -61,7 +62,7 @@ namespace FogboundMaze
             if (input.PausePressed && (Phase == GamePhase.LevelSelect || Phase == GamePhase.Guide)) ShowTitle();
             if (Phase == GamePhase.Staging)
             {
-                if (player.Weapon.Type != WeaponType.None
+                if (LoadoutConfirmed
                     && player.transform.position.z >= world.EntryPosition.z - 1.25f
                     && world.IsInside(player.transform.position))
                     BeginRun();
@@ -69,7 +70,7 @@ namespace FogboundMaze
             }
 
             if (input.PausePressed && (Phase is GamePhase.Playing or GamePhase.Paused
-                || (Phase == GamePhase.Staging && player.Weapon.Type != WeaponType.None)))
+                || (Phase == GamePhase.Staging && LoadoutConfirmed)))
             {
                 SetPaused(Phase != GamePhase.Paused);
             }
@@ -103,7 +104,7 @@ namespace FogboundMaze
                 return;
             }
             if (focused && player != null && player.Weapon != null
-                && player.Weapon.Type != WeaponType.None
+                && LoadoutConfirmed
                 && Phase is GamePhase.Staging or GamePhase.Playing)
                 SetCursorLocked(true);
         }
@@ -112,6 +113,13 @@ namespace FogboundMaze
         {
             if (Phase != GamePhase.Staging) return;
             player.Weapon.Equip(type);
+            ConfirmLoadout();
+        }
+
+        public void ConfirmLoadout()
+        {
+            if (Phase != GamePhase.Staging || !player.Weapon.HasLoadout || LoadoutConfirmed) return;
+            LoadoutConfirmed = true;
             world.OpenStartGate();
             Hud.HideWeaponSelection();
             Hud.ShowEntryPrompt();
@@ -121,7 +129,7 @@ namespace FogboundMaze
 
         public void BeginRun()
         {
-            if (Phase != GamePhase.Staging || player.Weapon.Type == WeaponType.None) return;
+            if (Phase != GamePhase.Staging || !LoadoutConfirmed) return;
             Phase = GamePhase.Playing;
             nextSpawn = Time.time + 1.2f;
             Hud.SetPhase(Phase, currentLevel);
@@ -176,7 +184,8 @@ namespace FogboundMaze
             pool.DespawnAll();
             pendingSpawns = 0;
             input.ResetMobile();
-            player.Weapon.Equip(WeaponType.None);
+            LoadoutConfirmed = false;
+            player.Weapon.ClearLoadout();
             player.Teleport(world.StartPosition + Vector3.up * 0.08f);
             player.Health.ResetHealth(100f);
             player.transform.rotation = Quaternion.identity;
@@ -201,7 +210,7 @@ namespace FogboundMaze
         public void SetPaused(bool paused)
         {
             if (paused && Phase != GamePhase.Playing
-                && !(Phase == GamePhase.Staging && player.Weapon.Type != WeaponType.None)) return;
+                && !(Phase == GamePhase.Staging && LoadoutConfirmed)) return;
             if (!paused && Phase != GamePhase.Paused) return;
             input.ResetMobile();
             if (paused) phaseBeforePause = Phase;
@@ -228,7 +237,8 @@ namespace FogboundMaze
             player.transform.rotation = Quaternion.identity;
             cameraRig.ResetView();
             player.Health.ResetHealth(100f);
-            player.Weapon.Equip(WeaponType.None);
+            LoadoutConfirmed = false;
+            player.Weapon.PrepareLoadout();
             environment.Apply(level);
             elapsed = 0f;
             kills = 0;

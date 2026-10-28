@@ -56,7 +56,7 @@ namespace FogboundMaze.Tests
         }
 
         [UnityTest]
-        public IEnumerator HeldFireUsesCooldownAndReloadsThirtyRounds()
+        public IEnumerator HeldFireUsesCooldownAndManualReloadTransfersReserveAmmunition()
         {
             var enemy = Enemy(Vector3.forward * 8f);
             var gun = game.Player.Weapon;
@@ -74,10 +74,12 @@ namespace FogboundMaze.Tests
             yield return new WaitForSeconds(1.5f);
             Assert.That(gun.IsReloading, Is.False);
             Assert.That(gun.Ammunition, Is.EqualTo(30));
+            Assert.That(gun.ReserveAmmunition, Is.EqualTo(88));
             Assert.That(gun.ReloadReady, Is.True);
             yield return null;
             game.Hud.Refresh(game, game.Player);
-            Assert.That(game.Hud.transform.Find("Top Bar/Weapon").GetComponent<Text>().text, Is.EqualTo("READY  30 / 30"));
+            Assert.That(game.Hud.transform.Find("Weapon HUD/Ammo").GetComponent<Text>().text, Is.EqualTo("30 / 088"));
+            Assert.That(game.Hud.transform.Find("Weapon HUD/State").GetComponent<Text>().text, Is.EqualTo("READY"));
             gun.Tick(true, false, false);
             Assert.That(gun.ReloadReady, Is.False);
             Assert.That(gun.Ammunition, Is.EqualTo(29));
@@ -128,7 +130,32 @@ namespace FogboundMaze.Tests
             yield return new WaitForSeconds(1.5f);
             Assert.That(gun.IsReloading, Is.False);
             Assert.That(gun.ReloadReady, Is.False);
-            Assert.That(gun.Ammunition, Is.Zero);
+            Assert.That(gun.Ammunition, Is.EqualTo(29));
+            Assert.That(gun.ReserveAmmunition, Is.EqualTo(90));
+            gun.Equip(WeaponType.SubmachineGun);
+            Assert.That(gun.Ammunition, Is.EqualTo(29));
+        }
+
+        [UnityTest]
+        public IEnumerator EmptyMagazineNeverAutoReloads_AndManualReloadIsRequired()
+        {
+            var gun = game.Player.Weapon;
+            for (var shot = 0; shot < WeaponController.GunMagazineSize; shot++)
+            {
+                gun.Tick(true,false,false);
+                yield return new WaitForSeconds(.11f);
+            }
+            Assert.That(gun.Ammunition,Is.Zero);
+            gun.Tick(true,false,false);
+            yield return new WaitForSeconds(.4f);
+            Assert.That(gun.IsReloading,Is.False);
+            Assert.That(gun.Ammunition,Is.Zero);
+            Assert.That(gun.EmptyFeedback,Is.True);
+            gun.Tick(false,false,true);
+            Assert.That(gun.IsReloading,Is.True);
+            yield return new WaitForSeconds(WeaponController.ReloadDuration + .1f);
+            Assert.That(gun.Ammunition,Is.EqualTo(WeaponController.GunMagazineSize));
+            Assert.That(gun.ReserveAmmunition,Is.EqualTo(60));
         }
 
         [UnityTest]

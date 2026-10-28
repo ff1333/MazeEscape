@@ -74,6 +74,7 @@ namespace FogboundMaze
             entryPrompt.gameObject.SetActive(false);
             miniMap.gameObject.SetActive(false);
             transform.Find("Top Bar").gameObject.SetActive(false);
+            transform.Find("Weapon HUD").gameObject.SetActive(false);
             if (mobileRoot != null) mobileRoot.SetActive(false);
             titlePanel.SetActive(phase == GamePhase.Title);
             levelPanel.SetActive(phase == GamePhase.LevelSelect);

@@ -62,7 +62,9 @@ namespace FogboundMaze.Tests
             game.Hud.transform.Find("Level Select/Level 01").GetComponent<Button>().onClick.Invoke();
             Assert.That(game.Phase, Is.EqualTo(GamePhase.Staging));
             Assert.That(game.Hud.transform.Find("Weapon Selection").gameObject.activeSelf, Is.True);
-            Assert.That(game.Player.Weapon.Type, Is.EqualTo(WeaponType.None));
+            Assert.That(game.Player.Weapon.Type, Is.EqualTo(WeaponType.SubmachineGun));
+            Assert.That(game.LoadoutConfirmed, Is.False);
+            Assert.That(game.Hud.transform.Find("Weapon Selection/Deploy"), Is.Not.Null);
             game.NextLevel();
             Assert.That(game.CurrentLevel.levelNumber, Is.EqualTo(1));
         }

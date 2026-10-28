@@ -41,6 +41,12 @@ namespace FogboundMaze
         private readonly List<Image> damageEdges = new();
         private Text hitMarker;
         private Text hitDetails;
+        private Image gunSlot;
+        private Image bladeSlot;
+        private Text ammoText;
+        private Text weaponStateText;
+        private Image reloadFill;
+        private GameObject weaponHud;
 
         public int ExploredCells => miniMap?.VisitedCount ?? 0;
 
@@ -75,15 +81,7 @@ namespace FogboundMaze
             levelText.text = $"LEVEL  {director.CurrentLevel.levelNumber:00}";
             timerText.text = TimeSpan.FromSeconds(director.Elapsed).ToString(@"mm\:ss");
             killsText.text = $"KILLS  {director.Kills:000}";
-            weaponText.text = player.Weapon.Type switch
-            {
-                WeaponType.SubmachineGun => player.Weapon.IsReloading ? $"RELOAD  {player.Weapon.ReloadProgress:P0}"
-                    : player.Weapon.ReloadReady ? $"READY  {player.Weapon.Ammunition:00} / {player.Weapon.MagazineSize}"
-                    : $"SMG  {player.Weapon.Ammunition:00} / {player.Weapon.MagazineSize}",
-                WeaponType.LongBlade => "LONG BLADE  |  3.4m",
-                _ => "UNARMED"
-            };
-            weaponText.color = player.Weapon.ReloadReady ? Accent : Ink;
+            RefreshWeaponHud(player.Weapon);
             statusText.text = director.CurrentLevel.miasma
                 ? (director.IsPlayerSafe ? "LIGHT SAFE" : "MIASMA EXPOSED")
                 : string.Empty;
@@ -119,6 +117,7 @@ namespace FogboundMaze
             transform.Find("Top Bar").gameObject.SetActive(true);
             if (mobileRoot != null) mobileRoot.SetActive(false);
             selectionPanel.SetActive(true);
+            weaponHud.SetActive(false);
             miniMap.gameObject.SetActive(false);
             crosshair.SetActive(false);
             entryPrompt.gameObject.SetActive(false);
@@ -132,6 +131,7 @@ namespace FogboundMaze
         {
             if (mobileRoot != null) mobileRoot.SetActive(true);
             selectionPanel.SetActive(false);
+            weaponHud.SetActive(true);
             miniMap.gameObject.SetActive(true);
             crosshair.SetActive(true);
         }
@@ -153,6 +153,7 @@ namespace FogboundMaze
         {
             if (mobileRoot != null) mobileRoot.SetActive(false);
             resultPanel.SetActive(true);
+            weaponHud.SetActive(false);
             crosshair.SetActive(false);
             resultTitle.text = won ? (level == 10 ? "CAMPAIGN CLEARED" : "EXIT REACHED") : "RUN LOST";
             resultTitle.color = won ? Accent : Warning;
@@ -195,6 +196,7 @@ namespace FogboundMaze
             EnsureEventSystem();
 
             BuildTopBar();
+            BuildWeaponHud();
             miniMap = MiniMapHud.Create(transform, font);
             BuildCrosshair();
             BuildDamageFeedback();
@@ -235,6 +237,74 @@ namespace FogboundMaze
             SetRect(levelText.rectTransform, new Vector2(0.77f, 0f), new Vector2(0.84f, 1f));
             killsText = Label("Kills", bar.transform, "KILLS  000", 23, TextAnchor.MiddleCenter);
             SetRect(killsText.rectTransform, new Vector2(0.85f, 0f), new Vector2(0.97f, 1f));
+        }
+
+        private void BuildWeaponHud()
+        {
+            var root = PanelObject("Weapon HUD", transform, new Color(.025f,.04f,.045f,.90f));
+            weaponHud = root;
+            SetRect(root.GetComponent<RectTransform>(), new Vector2(.72f,.035f), new Vector2(.98f,.205f));
+            AddFrame(root);
+            gunSlot = PanelObject("Gun Slot", root.transform, new Color(.10f,.18f,.20f,.95f)).GetComponent<Image>();
+            SetRect(gunSlot.rectTransform,new Vector2(.04f,.53f),new Vector2(.47f,.93f));
+            var gunLabel = Label("Label",gunSlot.transform,"[1]  SMG",23,TextAnchor.MiddleCenter);
+            SetRect(gunLabel.rectTransform,Vector2.zero,Vector2.one);
+            bladeSlot = PanelObject("Blade Slot", root.transform, new Color(.10f,.18f,.20f,.95f)).GetComponent<Image>();
+            SetRect(bladeSlot.rectTransform,new Vector2(.53f,.53f),new Vector2(.96f,.93f));
+            var bladeLabel = Label("Label",bladeSlot.transform,"[2]  LONG BLADE",21,TextAnchor.MiddleCenter);
+            SetRect(bladeLabel.rectTransform,Vector2.zero,Vector2.one);
+            ammoText = Label("Ammo",root.transform,"30 / 90",30,TextAnchor.MiddleLeft);
+            SetRect(ammoText.rectTransform,new Vector2(.06f,.12f),new Vector2(.48f,.50f));
+            weaponStateText = Label("State",root.transform,"READY",21,TextAnchor.MiddleRight,Accent);
+            SetRect(weaponStateText.rectTransform,new Vector2(.49f,.12f),new Vector2(.94f,.50f));
+            var reloadTrack = PanelObject("Reload Track",root.transform,new Color(.16f,.20f,.21f,.95f));
+            SetRect(reloadTrack.GetComponent<RectTransform>(),new Vector2(.05f,.05f),new Vector2(.95f,.10f));
+            reloadFill = PanelObject("Reload Fill",reloadTrack.transform,Accent).GetComponent<Image>();
+            SetRect(reloadFill.rectTransform,Vector2.zero,new Vector2(0f,1f));
+            reloadTrack.GetComponent<Image>().raycastTarget = false;
+            reloadFill.raycastTarget = false;
+            root.SetActive(false);
+        }
+
+        private void RefreshWeaponHud(WeaponController weapon)
+        {
+            if (weaponHud != null) weaponHud.SetActive(weapon.Type != WeaponType.None && !selectionPanel.activeSelf && !resultPanel.activeSelf);
+            var gunActive = weapon.Type == WeaponType.SubmachineGun;
+            gunSlot.color = gunActive ? new Color(.10f,.48f,.40f,.98f) : new Color(.10f,.18f,.20f,.95f);
+            bladeSlot.color = !gunActive && weapon.Type == WeaponType.LongBlade
+                ? new Color(.58f,.30f,.12f,.98f) : new Color(.10f,.18f,.20f,.95f);
+            weaponText.text = gunActive ? "SMG  /  LONG BLADE" : weapon.Type == WeaponType.LongBlade
+                ? "LONG BLADE  /  SMG" : "UNARMED";
+            if (gunActive)
+            {
+                ammoText.text = $"{weapon.Ammunition:00} / {weapon.ReserveAmmunition:000}";
+                weaponStateText.text = weapon.IsReloading ? $"RELOAD  {weapon.ReloadProgress:P0}"
+                    : weapon.EmptyFeedback ? "EMPTY - PRESS R"
+                    : weapon.ReloadReady ? "READY" : "R  RELOAD";
+                weaponStateText.color = weapon.EmptyFeedback ? Warning : weapon.ReloadReady ? Accent : Ink;
+                reloadFill.rectTransform.anchorMax = new Vector2(weapon.IsReloading ? weapon.ReloadProgress : 0f,1f);
+            }
+            else
+            {
+                ammoText.text = $"RANGE  {WeaponController.BladeRange:0.0}m";
+                weaponStateText.text = weapon.AttackCooldownRemaining > 0f ? "RECOVERING" : "READY";
+                weaponStateText.color = weapon.AttackCooldownRemaining > 0f ? Warning : Accent;
+                var cooldown = Mathf.Clamp01(weapon.AttackCooldownRemaining / .72f);
+                reloadFill.rectTransform.anchorMax = new Vector2(1f - cooldown,1f);
+            }
+            RefreshCrosshairStyle(weapon.Type);
+        }
+
+        private void RefreshCrosshairStyle(WeaponType type)
+        {
+            if (crosshairParts.Count < 5) return;
+            var blade = type == WeaponType.LongBlade;
+            crosshairParts[1].gameObject.SetActive(!blade);
+            crosshairParts[2].gameObject.SetActive(!blade);
+            crosshairParts[3].rectTransform.anchoredPosition = new Vector2(blade ? -27f : -15f,0f);
+            crosshairParts[4].rectTransform.anchoredPosition = new Vector2(blade ? 27f : 15f,0f);
+            crosshairParts[3].rectTransform.sizeDelta = blade ? new Vector2(18f,4f) : new Vector2(11f,3f);
+            crosshairParts[4].rectTransform.sizeDelta = blade ? new Vector2(18f,4f) : new Vector2(11f,3f);
         }
 
         private void BuildCrosshair()
@@ -306,25 +376,28 @@ namespace FogboundMaze
             AddFrame(selectionPanel);
             var rect = selectionPanel.GetComponent<RectTransform>();
             SetRect(rect,new Vector2(.20f,.19f),new Vector2(.80f,.81f));
-            var title = Label("Title", selectionPanel.transform, "CHOOSE YOUR LOADOUT", 42, TextAnchor.MiddleCenter);
+            var title = Label("Title", selectionPanel.transform, "DUNGEON LOADOUT READY", 42, TextAnchor.MiddleCenter);
             SetRect(title.rectTransform, new Vector2(0f, 0.72f), Vector2.one);
-            var subtitle = Label("Subtitle", selectionPanel.transform, "ONE WEAPON. ONE EXIT.", 23, TextAnchor.MiddleCenter, new Color(0.80f, 0.87f, 0.86f));
+            var subtitle = Label("Subtitle", selectionPanel.transform, "SMG FOR RANGE. LONG BLADE FOR SILENCE.", 23, TextAnchor.MiddleCenter, new Color(0.80f, 0.87f, 0.86f));
             SetRect(subtitle.rectTransform, new Vector2(0f, 0.61f), new Vector2(1f, 0.76f));
-            var pistol = Button("Pistol", selectionPanel.transform, "SMG\n30 rounds  |  32m", new Color(0.12f, 0.42f, 0.55f));
+            var pistol = Button("Pistol", selectionPanel.transform, "[1] SMG\n30 + 90 rounds  |  32m", new Color(0.12f, 0.42f, 0.55f));
             SetRect(pistol.GetComponent<RectTransform>(), new Vector2(0.08f, 0.23f), new Vector2(0.48f, 0.58f));
-            pistol.onClick.AddListener(() => GameDirector.Instance.SelectWeapon(WeaponType.SubmachineGun));
+            pistol.onClick.AddListener(() => GameDirector.Instance.Player.Weapon.Equip(WeaponType.SubmachineGun));
             var machete = Button("Machete", selectionPanel.transform, "LONG BLADE\n70 damage  |  3.4m", new Color(0.55f, 0.25f, 0.12f));
             SetRect(machete.GetComponent<RectTransform>(), new Vector2(0.52f, 0.23f), new Vector2(0.92f, 0.58f));
-            machete.onClick.AddListener(() => GameDirector.Instance.SelectWeapon(WeaponType.LongBlade));
+            machete.onClick.AddListener(() => GameDirector.Instance.Player.Weapon.Equip(WeaponType.LongBlade));
             AddWeaponPreview(pistol, "SMGPreview");
             AddWeaponPreview(machete, "LongBladePreview");
             var controls = Application.isMobilePlatform
-                ? "LEFT STICK MOVE  |  SWIPE LOOK  |  FIRE ATTACK\nRUN SPRINT  |  R RELOAD  |  VIEW CAMERA"
-                : "WASD MOVE  |  MOUSE AIM  |  HOLD LEFT CLICK ATTACK\nSHIFT SPRINT  |  R RELOAD  |  V CAMERA  |  ESC RELEASE MOUSE";
+                ? "LEFT STICK MOVE  |  SWIPE LOOK  |  FIRE ATTACK\nGUN / BLADE SWITCH  |  R MANUAL RELOAD  |  VIEW CAMERA"
+                : "WASD MOVE  |  MOUSE AIM  |  HOLD LEFT CLICK ATTACK\n1 / 2 OR WHEEL SWITCH  |  R MANUAL RELOAD  |  V CAMERA";
             var help = Label("Controls", selectionPanel.transform, controls, 22, TextAnchor.MiddleCenter);
             SetRect(help.rectTransform, new Vector2(0.04f, 0.10f), new Vector2(0.96f, 0.23f));
+            var deploy = Button("Deploy", selectionPanel.transform, "ENTER DUNGEON", Accent);
+            SetRect(deploy.GetComponent<RectTransform>(),new Vector2(.52f,.02f),new Vector2(.92f,.10f));
+            deploy.onClick.AddListener(() => GameDirector.Instance.ConfirmLoadout());
             var back = Button("Back To Levels", selectionPanel.transform, "BACK TO LEVELS", new Color(0.16f, 0.22f, 0.23f));
-            SetRect(back.GetComponent<RectTransform>(), new Vector2(0.28f, 0.02f), new Vector2(0.72f, 0.09f));
+            SetRect(back.GetComponent<RectTransform>(), new Vector2(0.08f, 0.02f), new Vector2(0.48f, 0.10f));
             back.onClick.AddListener(() => GameDirector.Instance.ShowLevelSelection());
         }
 

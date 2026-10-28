@@ -42,7 +42,7 @@ namespace FogboundMaze
             }
 
             if (GameDirector.Instance.Phase != GamePhase.Playing
-                && !(GameDirector.Instance.Phase == GamePhase.Staging && Weapon.Type != WeaponType.None))
+                && !(GameDirector.Instance.Phase == GamePhase.Staging && GameDirector.Instance.LoadoutConfirmed))
             {
                 return;
             }
@@ -65,6 +65,8 @@ namespace FogboundMaze
                 && ground.normal.y > 0.9f)
                 lastGroundedPosition = transform.position;
 
+            if (input.SelectGunPressed) Weapon.Equip(WeaponType.SubmachineGun);
+            if (input.SelectBladePressed) Weapon.Equip(WeaponType.LongBlade);
             Weapon.Tick(input.AttackHeld, input.AttackPressed, input.ReloadPressed);
         }
     }

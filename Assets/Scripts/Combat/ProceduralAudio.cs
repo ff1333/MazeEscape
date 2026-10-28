@@ -9,9 +9,11 @@ namespace FogboundMaze
         private static AudioClip impact;
         private static AudioClip reload;
         private static AudioClip reloadComplete;
+        private static AudioClip dryFire;
         public static AudioClip Impact => impact ??= Create("Hit Confirm", .075f, 240f, 900f, .65f, 103);
         public static AudioClip Reload => reload ??= Create("Magazine", .13f, 110f, 1800f, .8f, 221);
         public static AudioClip ReloadComplete => reloadComplete ??= CreateReloadComplete();
+        public static AudioClip DryFire => dryFire ??= Create("Dry Fire", .055f, 420f, 680f, .18f, 417);
 
         private static AudioClip CreateReloadComplete()
         {

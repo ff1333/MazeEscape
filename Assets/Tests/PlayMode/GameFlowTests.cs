@@ -262,7 +262,8 @@ namespace FogboundMaze.Tests
             Assert.That(director.Phase, Is.EqualTo(GamePhase.Staging));
             director.ReturnToLoadout();
             yield return null;
-            Assert.That(director.Player.Weapon.Type, Is.EqualTo(WeaponType.None));
+            Assert.That(director.Player.Weapon.Type, Is.EqualTo(WeaponType.SubmachineGun));
+            Assert.That(director.LoadoutConfirmed, Is.False);
             Assert.That(Time.timeScale, Is.EqualTo(1f));
         }
 
@@ -389,11 +390,13 @@ namespace FogboundMaze.Tests
             Assert.That(director, Is.Not.Null);
             Assert.That(director.Phase, Is.EqualTo(GamePhase.Staging));
             Assert.That(director.World.Layout.Width, Is.EqualTo(7));
-            Assert.That(director.Player.Weapon.Type, Is.EqualTo(WeaponType.None));
+            Assert.That(director.Player.Weapon.Type, Is.EqualTo(WeaponType.SubmachineGun));
+            Assert.That(director.LoadoutConfirmed, Is.False);
 
             director.SelectWeapon(WeaponType.SubmachineGun);
             yield return null;
             Assert.That(director.Player.Weapon.Type, Is.EqualTo(WeaponType.SubmachineGun));
+            Assert.That(director.LoadoutConfirmed, Is.True);
             Assert.That(director.World.StartGate.activeSelf, Is.False);
 
             director.BeginRun();

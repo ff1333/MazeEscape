@@ -9,6 +9,8 @@ namespace FogboundMaze
         Attack,
         Sprint,
         Reload,
+        Gun,
+        Blade,
         Toggle,
         Pause
     }
@@ -22,7 +24,9 @@ namespace FogboundMaze
             CreateButton(canvas, input, font, "FIRE", MobileAction.Attack, new Vector2(0.89f, 0.18f), 150f);
             CreateButton(canvas, input, font, "RUN", MobileAction.Sprint, new Vector2(0.77f, 0.12f), 110f);
             CreateButton(canvas, input, font, "R", MobileAction.Reload, new Vector2(0.93f, 0.36f), 92f);
-            CreateButton(canvas, input, font, "VIEW", MobileAction.Toggle, new Vector2(0.82f, 0.36f), 92f);
+            CreateButton(canvas, input, font, "GUN", MobileAction.Gun, new Vector2(0.72f, 0.36f), 92f);
+            CreateButton(canvas, input, font, "BLADE", MobileAction.Blade, new Vector2(0.82f, 0.36f), 92f);
+            CreateButton(canvas, input, font, "VIEW", MobileAction.Toggle, new Vector2(0.82f, 0.50f), 86f);
             CreateButton(canvas, input, font, "II", MobileAction.Pause, new Vector2(0.96f, 0.93f), 74f);
         }
 
@@ -135,6 +139,8 @@ namespace FogboundMaze
                 case MobileAction.Attack: input.SetMobileAttack(true); break;
                 case MobileAction.Sprint: input.SetMobileSprint(true); break;
                 case MobileAction.Reload: input.PressMobileReload(); break;
+                case MobileAction.Gun: input.PressMobileGun(); break;
+                case MobileAction.Blade: input.PressMobileBlade(); break;
                 case MobileAction.Toggle: input.PressMobileToggle(); break;
                 case MobileAction.Pause: input.PressMobilePause(); break;
             }

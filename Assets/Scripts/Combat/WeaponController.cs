@@ -10,6 +10,9 @@ namespace FogboundMaze
         public const float BladeRange = 3.4f;
         public const float GunDamage = 22f;
         public const float BladeDamage = 70f;
+        public const int GunMagazineSize = 30;
+        public const int StartingReserveAmmunition = 90;
+        public const float ReloadDuration = 1.35f;
         private PlayerController owner;
         private Camera viewCamera;
         private Transform viewMount;
@@ -19,20 +22,27 @@ namespace FogboundMaze
         private float nextAttack;
         private float recoil;
         private int ammunition;
+        private int reserveAmmunition;
         private bool reloading;
         private bool swinging;
         private float reloadProgress;
         private float reloadReadyUntil;
+        private float emptyFeedbackUntil;
+        private float nextDryFire;
         private AudioSource audioSource;
         private readonly HashSet<EnemyAgent> struck = new();
 
         public float ReloadProgress => reloadProgress;
         public WeaponType Type => type;
         public int Ammunition => ammunition;
-        public int MagazineSize => type == WeaponType.SubmachineGun ? 30 : 0;
+        public int MagazineSize => GunMagazineSize;
+        public int ReserveAmmunition => reserveAmmunition;
         public bool IsReloading => reloading;
         public bool ReloadReady => Time.time < reloadReadyUntil;
         public bool IsSwinging => swinging;
+        public bool EmptyFeedback => Time.time < emptyFeedbackUntil;
+        public bool HasLoadout => type != WeaponType.None;
+        public float AttackCooldownRemaining => Mathf.Max(0f, nextAttack - Time.time);
 
         public void Initialize(PlayerController player, Camera camera)
         {
@@ -58,18 +68,39 @@ namespace FogboundMaze
             }
         }
 
-        public void Equip(WeaponType weaponType)
+        public void PrepareLoadout()
         {
-            StopAllCoroutines();
-            reloading = swinging = false;
-            reloadProgress = recoil = nextAttack = 0f;
-            reloadReadyUntil = 0f;
-            type = weaponType;
-            ammunition = MagazineSize;
+            CancelTransientAction();
+            ammunition = GunMagazineSize;
+            reserveAmmunition = StartingReserveAmmunition;
+            Equip(WeaponType.SubmachineGun);
+            owner.GetComponent<PlayerVisual>()?.Equip(type);
+        }
+
+        public void ClearLoadout()
+        {
+            CancelTransientAction();
+            type = WeaponType.None;
+            ammunition = reserveAmmunition = 0;
             foreach (Transform child in viewMount) Destroy(child.gameObject);
             viewWeapon = muzzleTip = null;
             owner.GetComponent<PlayerVisual>()?.Equip(type);
-            if (type == WeaponType.None) return;
+        }
+
+        public void Equip(WeaponType weaponType)
+        {
+            if (weaponType == WeaponType.None)
+            {
+                ClearLoadout();
+                return;
+            }
+            if (weaponType is not (WeaponType.SubmachineGun or WeaponType.LongBlade)) return;
+            if (type == weaponType && viewWeapon != null) return;
+            CancelTransientAction();
+            type = weaponType;
+            foreach (Transform child in viewMount) Destroy(child.gameObject);
+            viewWeapon = muzzleTip = null;
+            owner.GetComponent<PlayerVisual>()?.Equip(type);
             viewMount.localPosition = type == WeaponType.SubmachineGun
                 ? new Vector3(.32f,-.30f,.65f) : new Vector3(.38f,-.38f,.85f);
             var prefab = Resources.Load<GameObject>(type == WeaponType.SubmachineGun ? "Weapons/SMG" : "Weapons/LongBlade");
@@ -81,16 +112,21 @@ namespace FogboundMaze
 
         public void Tick(bool held, bool pressed, bool reloadPressed)
         {
-            if (type == WeaponType.None || reloading || owner.Health.IsDead) return;
+            if (type == WeaponType.None || owner.Health.IsDead) return;
+            if (reloading) return;
             if (reloadPressed && type == WeaponType.SubmachineGun && ammunition < MagazineSize)
             {
-                StartCoroutine(Reload());
+                if (reserveAmmunition > 0) StartCoroutine(Reload());
                 return;
             }
             if ((!held && !pressed) || Time.time < nextAttack) return;
             if (type == WeaponType.SubmachineGun)
             {
-                if (ammunition <= 0) { StartCoroutine(Reload()); return; }
+                if (ammunition <= 0)
+                {
+                    SignalEmptyMagazine();
+                    return;
+                }
                 nextAttack = Time.time + .105f;
                 Fire();
             }
@@ -215,12 +251,14 @@ namespace FogboundMaze
 
         private IEnumerator Reload()
         {
-            if (reloading || type != WeaponType.SubmachineGun) yield break;
+            if (reloading || type != WeaponType.SubmachineGun || ammunition >= MagazineSize || reserveAmmunition <= 0)
+                yield break;
             reloading = true;
+            emptyFeedbackUntil = 0f;
             audioSource.PlayOneShot(ProceduralAudio.Reload, .7f);
-            for (var elapsed = 0f; elapsed < 1.35f; elapsed += Time.deltaTime)
+            for (var elapsed = 0f; elapsed < ReloadDuration; elapsed += Time.deltaTime)
             {
-                reloadProgress = elapsed / 1.35f;
+                reloadProgress = elapsed / ReloadDuration;
                 var dip = Mathf.Sin(reloadProgress * Mathf.PI);
                 viewWeapon.localPosition = new Vector3(0f, -.24f * dip, 0f);
                 viewWeapon.localRotation = Quaternion.Euler(20f * dip, 0f, -30f * dip);
@@ -238,10 +276,28 @@ namespace FogboundMaze
                 yield break;
             }
             reloadProgress = 1f;
-            ammunition = MagazineSize;
+            var transferred = Mathf.Min(MagazineSize - ammunition, reserveAmmunition);
+            ammunition += transferred;
+            reserveAmmunition -= transferred;
             reloading = false;
             reloadReadyUntil = Time.time + .85f;
             audioSource.PlayOneShot(ProceduralAudio.ReloadComplete, .9f);
+        }
+
+        private void SignalEmptyMagazine()
+        {
+            emptyFeedbackUntil = Time.time + .65f;
+            if (Time.time < nextDryFire) return;
+            nextDryFire = Time.time + .3f;
+            audioSource.PlayOneShot(ProceduralAudio.DryFire, .65f);
+        }
+
+        private void CancelTransientAction()
+        {
+            StopAllCoroutines();
+            reloading = swinging = false;
+            reloadProgress = recoil = nextAttack = 0f;
+            reloadReadyUntil = emptyFeedbackUntil = 0f;
         }
 
         private void OnDestroy()
