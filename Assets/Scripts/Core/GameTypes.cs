@@ -3,7 +3,7 @@ namespace FogboundMaze
     public enum WeaponType
     {
         None,
-        SubmachineGun = 1,
+        SniperRifle = 1,
         LongBlade = 2
     }
 

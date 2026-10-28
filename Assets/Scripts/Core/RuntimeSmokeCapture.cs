@@ -24,6 +24,7 @@ namespace FogboundMaze
             var guide = System.Array.Exists(arguments, value => value == "-fogboundGuide");
             var combat = System.Array.Exists(arguments, value => value == "-fogboundCombat");
             var reload = System.Array.Exists(arguments, value => value == "-fogboundReload");
+            var scope = System.Array.Exists(arguments, value => value == "-fogboundScope");
             var fogZone = System.Array.Exists(arguments, value => value == "-fogboundFogZone");
             var levelNumber = int.TryParse(ReadArgument(arguments, "-fogboundLevel"), out var requestedLevel)
                 ? Mathf.Clamp(requestedLevel, 1, 10) : 1;
@@ -69,13 +70,14 @@ namespace FogboundMaze
             if (actors)
             {
                 var director = GameDirector.Instance;
-                director.SelectWeapon(machete ? WeaponType.LongBlade : WeaponType.SubmachineGun);
+                director.SelectWeapon(machete ? WeaponType.LongBlade : WeaponType.SniperRifle);
                 var pool = FindFirstObjectByType<EnemyPool>();
                 foreach (var elite in new[] { false, true })
                 {
                     var enemy = pool.Spawn(director.Player, director.World,
                         director.World.EntryPosition + new Vector3(elite ? 1.1f : -1.1f, 0f, elite ? 0.8f : 0f), elite);
                     enemy.transform.LookAt(director.Player.transform.position);
+                    enemy.enabled = false;
                 }
                 yield return new WaitForSecondsRealtime(0.5f);
             }
@@ -83,19 +85,24 @@ namespace FogboundMaze
             if (pause)
             {
                 var director = GameDirector.Instance;
-                director.SelectWeapon(WeaponType.SubmachineGun);
+                director.SelectWeapon(WeaponType.SniperRifle);
                 director.SetPaused(true);
                 yield return new WaitForSecondsRealtime(0.5f);
             }
             else if (gameplay)
             {
                 var director = GameDirector.Instance;
-                director.SelectWeapon(machete ? WeaponType.LongBlade : WeaponType.SubmachineGun);
+                director.SelectWeapon(machete ? WeaponType.LongBlade : WeaponType.SniperRifle);
                 if (!walkRoute)
                     director.Player.GetComponent<CharacterController>().Move(Vector3.forward * 3.5f);
                 yield return null;
                 if (firstPerson)
                     director.CameraRig.TickLook(Vector2.zero, true);
+                if (scope)
+                {
+                    director.Player.Weapon.Equip(WeaponType.SniperRifle);
+                    director.Input.SetMobileAim(true);
+                }
                 if (walkRoute)
                 {
                     var controller = director.Player.GetComponent<CharacterController>();
@@ -174,22 +181,25 @@ namespace FogboundMaze
                 if (reload)
                 {
                     var weapon = GameDirector.Instance.Player.Weapon;
-                    weapon.Tick(true, false, false);
+                    weapon.Equip(WeaponType.SniperRifle);
+                    weapon.Tick(false, true, false);
+                    yield return new WaitForSeconds(WeaponController.BoltCycleDuration + .05f);
                     weapon.Tick(false, false, true);
-                    yield return new WaitForSeconds(1.45f);
-                    if (weapon.IsReloading || !weapon.ReloadReady || weapon.Ammunition != 30)
+                    yield return new WaitForSeconds(WeaponController.ReloadDuration + .05f);
+                    if (weapon.IsReloading || !weapon.ReloadReady || weapon.Ammunition != 5
+                        || weapon.ReserveAmmunition != 19)
                     {
                         Debug.LogError("FOGBOUND_RELOAD_FAIL");
                         Application.Quit(2);
                         yield break;
                     }
-                    Debug.Log("FOGBOUND_RELOAD_PASS ammo=30 ready=true");
+                    Debug.Log("FOGBOUND_RELOAD_PASS ammo=5 reserve=19 ready=true");
                     Time.timeScale = 0f;
                     yield return null;
                 }
                 if (combat)
                 {
-                    GameDirector.Instance.Player.Weapon.Tick(true,true,false);
+                    GameDirector.Instance.Player.Weapon.Tick(true,true,false,false);
                     if (machete) yield return new WaitForSeconds(.15f);
                     Time.timeScale = 0f;
                     yield return null;
@@ -246,7 +256,7 @@ namespace FogboundMaze
                     yield return RunBladeCombat();
                     yield break;
                 case "view":
-                    yield return PrepareLevel(Mathf.Max(1,levelNumber),WeaponType.SubmachineGun);
+                    yield return PrepareLevel(Mathf.Max(1,levelNumber),WeaponType.SniperRifle);
                     director.CameraRig.TickLook(Vector2.zero,true);
                     yield return WalkMazePath(7,false);
                     yield return new WaitForSecondsRealtime(3f);
@@ -254,12 +264,12 @@ namespace FogboundMaze
                     yield return WalkMazePath(4,false);
                     yield break;
                 case "explore":
-                    yield return PrepareLevel(Mathf.Max(4,levelNumber),WeaponType.SubmachineGun);
+                    yield return PrepareLevel(Mathf.Max(4,levelNumber),WeaponType.SniperRifle);
                     yield return WalkMazePath(12,true);
                     yield return new WaitForSecondsRealtime(4f);
                     yield break;
                 case "hazards":
-                    yield return PrepareLevel(Mathf.Max(8,levelNumber),WeaponType.SubmachineGun);
+                    yield return PrepareLevel(Mathf.Max(8,levelNumber),WeaponType.SniperRifle);
                     yield return WalkMazePath(14,false);
                     yield return new WaitForSecondsRealtime(4f);
                     yield break;
@@ -312,7 +322,7 @@ namespace FogboundMaze
 
         private static IEnumerator RunGunCombat()
         {
-            yield return PrepareLevel(1,WeaponType.SubmachineGun);
+            yield return PrepareLevel(1,WeaponType.SniperRifle);
             var director = GameDirector.Instance;
             var path = MazePathfinder.FindPath(director.World.Layout,
                 director.World.Layout.Start,director.World.Layout.Goal);

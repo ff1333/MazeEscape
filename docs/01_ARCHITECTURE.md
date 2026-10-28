@@ -28,7 +28,7 @@
 | 世界 | `MazeWorld` | 生成碰撞体、门、灯和坐标转换 |
 | 玩家 | `PlayerController` | CharacterController 移动与重力 |
 | 相机 | `CameraRig` | 第一/第三人称切换和墙体避让 |
-| 战斗 | `WeaponController` | 双武器切换、Hitscan 冲锋枪、手动换弹、近战检测 |
+| 战斗 | `WeaponController` | 栓动狙击枪、配镜/拉栓/手动换弹、双武器切换和近战检测 |
 | AI | `EnemyPerception`、`EnemyDecisionModel`、`EnemyAgent` | 感知、记忆、Utility 评分与行为执行 |
 | 性能 | `EnemyPool` | 按关卡上限预热并复用敌人 |
 | 环境 | `EnvironmentController`、`MazeWorld` | 固定地下城状态、局部雾区、照明与污染 |

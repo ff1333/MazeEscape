@@ -61,10 +61,10 @@ namespace FogboundMaze.Tests
             Assert.That(game.SelectLevel(11), Is.False);
             game.Hud.transform.Find("Level Select/Level 01").GetComponent<Button>().onClick.Invoke();
             Assert.That(game.Phase, Is.EqualTo(GamePhase.Staging));
-            Assert.That(game.Hud.transform.Find("Weapon Selection").gameObject.activeSelf, Is.True);
-            Assert.That(game.Player.Weapon.Type, Is.EqualTo(WeaponType.SubmachineGun));
-            Assert.That(game.LoadoutConfirmed, Is.False);
-            Assert.That(game.Hud.transform.Find("Weapon Selection/Deploy"), Is.Not.Null);
+            Assert.That(game.Hud.transform.Find("Weapon Selection").gameObject.activeSelf, Is.False);
+            Assert.That(game.Player.Weapon.Type, Is.EqualTo(WeaponType.LongBlade));
+            Assert.That(game.LoadoutConfirmed, Is.True);
+            Assert.That(game.World.StartGate.activeSelf, Is.False);
             game.NextLevel();
             Assert.That(game.CurrentLevel.levelNumber, Is.EqualTo(1));
         }
@@ -75,12 +75,12 @@ namespace FogboundMaze.Tests
             var game = GameDirector.Instance;
             game.ShowLevelSelection();
             game.SelectLevel(1);
-            game.SelectWeapon(WeaponType.SubmachineGun);
+            game.SelectWeapon(WeaponType.SniperRifle);
             game.BeginRun();
             game.Player.Health.Damage(200f);
             Assert.That(game.Progress.IsUnlocked(2), Is.False);
             game.Retry();
-            game.SelectWeapon(WeaponType.SubmachineGun);
+            game.SelectWeapon(WeaponType.SniperRifle);
             game.BeginRun();
             game.CompleteLevel();
             Assert.That(game.Progress.IsCompleted(1), Is.True);
@@ -145,14 +145,16 @@ namespace FogboundMaze.Tests
         public IEnumerator ReloadFeedbackCompletes_AndLeavingRunClearsTransientState()
         {
             var game = GameDirector.Instance;
-            game.ShowLevelSelection(); game.SelectLevel(1); game.SelectWeapon(WeaponType.SubmachineGun);
+            game.ShowLevelSelection(); game.SelectLevel(1); game.SelectWeapon(WeaponType.SniperRifle);
             var weapon = game.Player.Weapon;
             weapon.Tick(false,true,false);
-            Assert.That(weapon.Ammunition,Is.EqualTo(29));
+            Assert.That(weapon.Ammunition,Is.EqualTo(4));
+            yield return new WaitForSeconds(WeaponController.BoltCycleDuration + .05f);
             weapon.Tick(false,false,true);
             Assert.That(weapon.IsReloading,Is.True);
-            yield return new WaitForSeconds(1.5f);
-            Assert.That(weapon.Ammunition,Is.EqualTo(30));
+            yield return new WaitForSeconds(WeaponController.ReloadDuration + .05f);
+            Assert.That(weapon.Ammunition,Is.EqualTo(5));
+            Assert.That(weapon.ReserveAmmunition,Is.EqualTo(19));
             Assert.That(weapon.IsReloading,Is.False);
             weapon.Tick(false,true,false);
             weapon.Tick(false,false,true);
@@ -203,7 +205,7 @@ namespace FogboundMaze.Tests
             var game = GameDirector.Instance;
             game.ShowLevelSelection();
             game.SelectLevel(1);
-            game.SelectWeapon(WeaponType.SubmachineGun);
+            game.SelectWeapon(WeaponType.SniperRifle);
             game.BeginRun();
             game.enabled = false;
             var pool = Object.FindFirstObjectByType<EnemyPool>();

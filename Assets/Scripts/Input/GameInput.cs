@@ -8,6 +8,7 @@ namespace FogboundMaze
         private Vector2 mobileMove;
         private Vector2 mobileLook;
         private bool mobileAttack;
+        private bool mobileAim;
         private bool mobileSprint;
         private bool mobileReload;
         private bool mobileGun;
@@ -19,6 +20,7 @@ namespace FogboundMaze
         public Vector2 Look { get; private set; }
         public bool AttackHeld { get; private set; }
         public bool AttackPressed { get; private set; }
+        public bool AimHeld { get; private set; }
         public bool ReloadPressed { get; private set; }
         public bool SelectGunPressed { get; private set; }
         public bool SelectBladePressed { get; private set; }
@@ -41,6 +43,7 @@ namespace FogboundMaze
             Look = (mouse != null ? mouse.delta.ReadValue() * 0.075f : Vector2.zero) + ConsumeMobileLook();
             AttackHeld = (mouse != null && mouse.leftButton.isPressed) || mobileAttack;
             AttackPressed = (mouse != null && mouse.leftButton.wasPressedThisFrame) || mobileAttack;
+            AimHeld = (mouse != null && mouse.rightButton.isPressed) || mobileAim;
             ReloadPressed = (keyboard != null && keyboard.rKey.wasPressedThisFrame) || Consume(ref mobileReload);
             var scroll = mouse != null ? mouse.scroll.ReadValue().y : 0f;
             SelectGunPressed = (keyboard != null && keyboard.digit1Key.wasPressedThisFrame)
@@ -56,10 +59,11 @@ namespace FogboundMaze
         public void ResetMobile()
         {
             mobileMove = mobileLook = Vector2.zero;
-            mobileAttack = mobileSprint = mobileReload = mobileGun = mobileBlade = mobileToggle = mobilePause = false;
+            mobileAttack = mobileAim = mobileSprint = mobileReload = mobileGun = mobileBlade = mobileToggle = mobilePause = false;
         }
         public void AddMobileLook(Vector2 value) => mobileLook += value;
         public void SetMobileAttack(bool value) => mobileAttack = value;
+        public void SetMobileAim(bool value) => mobileAim = value;
         public void SetMobileSprint(bool value) => mobileSprint = value;
         public void PressMobileReload() => mobileReload = true;
         public void PressMobileGun() => mobileGun = true;

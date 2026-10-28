@@ -4,16 +4,18 @@ namespace FogboundMaze
 {
     public static class ProceduralAudio
     {
-        private static AudioClip pistol;
+        private static AudioClip sniperRifle;
         private static AudioClip machete;
         private static AudioClip impact;
         private static AudioClip reload;
         private static AudioClip reloadComplete;
         private static AudioClip dryFire;
+        private static AudioClip boltAction;
         public static AudioClip Impact => impact ??= Create("Hit Confirm", .075f, 240f, 900f, .65f, 103);
         public static AudioClip Reload => reload ??= Create("Magazine", .13f, 110f, 1800f, .8f, 221);
         public static AudioClip ReloadComplete => reloadComplete ??= CreateReloadComplete();
         public static AudioClip DryFire => dryFire ??= Create("Dry Fire", .055f, 420f, 680f, .18f, 417);
+        public static AudioClip BoltAction => boltAction ??= Create("Bolt Action", .16f, 180f, 1350f, .78f, 519);
 
         private static AudioClip CreateReloadComplete()
         {
@@ -35,7 +37,7 @@ namespace FogboundMaze
             return clip;
         }
 
-        public static AudioClip SubmachineGun => pistol ??= Create("SMG", 0.085f, 95f, 950f, 0.55f, 37);
+        public static AudioClip SniperRifle => sniperRifle ??= Create("Sniper Rifle", 0.24f, 70f, 1250f, 0.68f, 37);
         public static AudioClip Machete => machete ??= Create("Machete", 0.18f, 90f, 230f, 0.24f, 91);
 
         private static AudioClip Create(string name, float duration, float low, float high, float noiseMix, int seed)

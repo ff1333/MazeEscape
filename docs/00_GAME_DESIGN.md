@@ -9,7 +9,7 @@ and survive long enough to find the exit.
 
 1. Open the title screen and press START.
 2. Select an unlocked level from the ten-level campaign.
-3. Spawn outside that maze and choose the pistol or machete.
+3. Spawn outside that maze holding the long blade, with a bolt-action sniper rifle available to switch to.
 4. Enter through the start gate and navigate while managing health and enemies.
 5. Reach the exit alive, save completion locally, and unlock the next level.
 6. Retry, replay a cleared level, return to level selection, or continue.

@@ -6,7 +6,7 @@ public static class FogboundPreviewBuilder
 {
     public static void Build()
     {
-        foreach (var weapon in new[] { "SMG", "LongBlade" })
+        foreach (var weapon in new[] { "SniperRifle", "LongBlade" })
         {
             var model = Object.Instantiate(Resources.Load<GameObject>("Weapons/" + weapon));
             model.transform.position = new Vector3(500,500,500);

@@ -73,9 +73,9 @@ namespace FogboundMaze
                 NoiseSystem.Emit(transform.position, 10f, NoiseKind.Sprint, this);
             }
 
-            if (input.SelectGunPressed) Weapon.Equip(WeaponType.SubmachineGun);
+            if (input.SelectGunPressed) Weapon.Equip(WeaponType.SniperRifle);
             if (input.SelectBladePressed) Weapon.Equip(WeaponType.LongBlade);
-            Weapon.Tick(input.AttackHeld, input.AttackPressed, input.ReloadPressed);
+            Weapon.Tick(input.AttackHeld, input.AttackPressed, input.ReloadPressed, input.AimHeld);
         }
     }
 }

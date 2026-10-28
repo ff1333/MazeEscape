@@ -7,6 +7,7 @@ namespace FogboundMaze
     public enum MobileAction
     {
         Attack,
+        Aim,
         Sprint,
         Reload,
         Gun,
@@ -22,6 +23,7 @@ namespace FogboundMaze
             CreateLookArea(canvas, input);
             CreateStick(canvas, input);
             CreateButton(canvas, input, font, "FIRE", MobileAction.Attack, new Vector2(0.89f, 0.18f), 150f);
+            CreateButton(canvas, input, font, "SCOPE", MobileAction.Aim, new Vector2(0.67f, 0.18f), 110f);
             CreateButton(canvas, input, font, "RUN", MobileAction.Sprint, new Vector2(0.77f, 0.12f), 110f);
             CreateButton(canvas, input, font, "R", MobileAction.Reload, new Vector2(0.93f, 0.36f), 92f);
             CreateButton(canvas, input, font, "GUN", MobileAction.Gun, new Vector2(0.72f, 0.36f), 92f);
@@ -137,6 +139,7 @@ namespace FogboundMaze
             switch (action)
             {
                 case MobileAction.Attack: input.SetMobileAttack(true); break;
+                case MobileAction.Aim: input.SetMobileAim(true); break;
                 case MobileAction.Sprint: input.SetMobileSprint(true); break;
                 case MobileAction.Reload: input.PressMobileReload(); break;
                 case MobileAction.Gun: input.PressMobileGun(); break;
@@ -149,6 +152,7 @@ namespace FogboundMaze
         public void OnPointerUp(PointerEventData eventData)
         {
             if (action == MobileAction.Attack) input.SetMobileAttack(false);
+            if (action == MobileAction.Aim) input.SetMobileAim(false);
             if (action == MobileAction.Sprint) input.SetMobileSprint(false);
         }
     }

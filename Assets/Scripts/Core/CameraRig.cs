@@ -11,10 +11,16 @@ namespace FogboundMaze
         private float pitch = 4f;
         private bool firstPerson;
         private bool menuView;
+        private bool aiming;
+
+        private const float DefaultFieldOfView = 68f;
+        private const float ScopeFieldOfView = 24f;
 
         public Camera Camera => viewCamera;
         public float Yaw => yaw;
         public bool IsFirstPerson => firstPerson;
+        public bool IsAiming => aiming;
+        public bool UsesFirstPersonView => firstPerson || aiming;
 
         public void Initialize(Transform followTarget)
         {
@@ -29,7 +35,8 @@ namespace FogboundMaze
                 gameObject.AddComponent<AudioListener>();
             }
             gameObject.tag = "MainCamera";
-            viewCamera.fieldOfView = 68f;
+            viewCamera.fieldOfView = DefaultFieldOfView;
+            viewCamera.nearClipPlane = 0.03f;
             viewCamera.clearFlags = CameraClearFlags.SolidColor;
             viewCamera.backgroundColor = new Color(0.075f, 0.13f, 0.145f);
             var flashlightObject = new GameObject("Flashlight");
@@ -52,6 +59,7 @@ namespace FogboundMaze
             yaw = target.eulerAngles.y;
             pitch = 4f;
             firstPerson = false;
+            aiming = false;
             if (playerVisual != null) playerVisual.SetActive(true);
             var rotation = Quaternion.Euler(pitch, yaw, 0f);
             var focus = target.position + Vector3.up * 1.55f;
@@ -62,6 +70,7 @@ namespace FogboundMaze
         {
             menuView = true;
             firstPerson = false;
+            aiming = false;
             if (playerVisual != null) playerVisual.SetActive(true);
             transform.position = stage + new Vector3(-1.65f, 1.9f, -2.3f);
             transform.LookAt(stage + new Vector3(0.8f, 1.05f, 2.5f));
@@ -77,6 +86,11 @@ namespace FogboundMaze
             }
         }
 
+        public void SetAiming(bool value)
+        {
+            aiming = value;
+        }
+
         private void LateUpdate()
         {
             if (target == null || menuView)
@@ -86,10 +100,14 @@ namespace FogboundMaze
 
             var rotation = Quaternion.Euler(pitch, yaw, 0f);
             var focus = target.position + Vector3.up * 1.55f;
-            if (firstPerson)
+            viewCamera.fieldOfView = Mathf.MoveTowards(viewCamera.fieldOfView,
+                aiming ? ScopeFieldOfView : DefaultFieldOfView, 110f * Time.unscaledDeltaTime);
+            if (UsesFirstPersonView)
             {
                 if (playerVisual != null && playerVisual.activeSelf) playerVisual.SetActive(false);
-                transform.SetPositionAndRotation(focus + rotation * new Vector3(0.18f, 0f, 0.5f), rotation);
+                // Keep the eye inside the CharacterController capsule. The previous 0.5 m
+                // forward offset could cross a wall before the player's collider did.
+                transform.SetPositionAndRotation(focus + rotation * Vector3.forward * 0.04f, rotation);
                 return;
             }
 

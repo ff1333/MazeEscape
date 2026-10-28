@@ -4,25 +4,25 @@ using UnityEngine;
 
 public static class FogboundWeaponBuilder
 {
-    [MenuItem("Maze Escape/Build SMG And Long Blade")]
+    [MenuItem("Maze Escape/Build Sniper Rifle And Long Blade")]
     public static void Build()
     {
         const string survivorPath = "Assets/Resources/Characters/Survivor.prefab";
         var survivor = PrefabUtility.LoadPrefabContents(survivorPath);
-        foreach (var name in new[] { "SMG", "LongBlade" })
+        foreach (var name in new[] { "SniperRifle", "LongBlade" })
         {
             var source = survivor.GetComponentsInChildren<Transform>(true)
-                .Single(t => t.name == (name == "SMG" ? "SMG" : "Knife"));
+                .Single(t => t.name == (name == "SniperRifle" ? "Rifle" : "Knife"));
             var root = new GameObject(name);
             var mesh = new GameObject("Model");
             mesh.transform.SetParent(root.transform, false);
             mesh.AddComponent<MeshFilter>().sharedMesh = source.GetComponent<MeshFilter>().sharedMesh;
             mesh.AddComponent<MeshRenderer>().sharedMaterial = source.GetComponent<MeshRenderer>().sharedMaterial;
-            if (name == "SMG")
+            if (name == "SniperRifle")
             {
                 mesh.transform.localScale = Vector3.one * 80f;
                 mesh.transform.localRotation = Quaternion.AngleAxis(90f, Vector3.up) * Quaternion.AngleAxis(180f, Vector3.right);
-                mesh.transform.localPosition = new Vector3(.093f, -.16f, .05f);
+                mesh.transform.localPosition = new Vector3(.11f, -.16f, .03f);
                 var muzzle = new GameObject("Muzzle").transform;
                 muzzle.SetParent(root.transform, false);
                 var vertices = mesh.GetComponent<MeshFilter>().sharedMesh.vertices;

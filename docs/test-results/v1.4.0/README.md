@@ -7,8 +7,8 @@
 ## 自动测试
 
 - EditMode：`21/21` 通过，0 失败。
-- PlayMode：`39/39` 通过，0 失败。
-- 覆盖迷宫连通与复杂度、A*、Utility AI 评分、视觉和遮挡、声音调查、有限警报、感知记忆重置、双武器、手动换弹、环境配置和原有主循环回归。
+- PlayMode：`42/42` 通过，0 失败。
+- 覆盖迷宫连通与复杂度、A*、Utility AI 评分、视觉和遮挡、声音调查、有限警报、感知记忆重置、默认长刀、狙击枪单发与拉栓、手动换弹、配镜减速、手持/背负互斥、环境配置和原有主循环回归。
 
 ## Windows Development 构建
 
@@ -16,20 +16,23 @@
 - 结果：成功。
 - errors：`0`。
 - warnings：`0`。
-- 大小：`170,314,628` bytes。
+- 大小：`170,676,088` bytes。
 
 ## 运行时冒烟
 
 - 独立 Player 退出码：`0`。
 - 版本检查：`FOGBOUND_VERSION_PASS 1.4.0`。
 - 运行时检查：`FOGBOUND_RUNTIME_SMOKE_PASS`。
-- 中文双武器准备界面截图成功，显示 30 + 90 发弹药、手动换弹提示和枪刀切换操作。
+- 默认长刀、狙击枪第三人称、配镜和手动换弹截图成功；配镜显示圆形遮罩、十字线和剩余专注时间，换弹完成后为 `5 / 19`。
 
 ## 证据文件
 
 - `EditMode.xml`
 - `PlayMode.xml`
-- `native/loadout-version.png`
+- `native/default-blade.png`
+- `native/sniper-third-person.png`
+- `native/sniper-scope.png`
+- `native/sniper-reload.png`
 
 ## 尚未完成
 
