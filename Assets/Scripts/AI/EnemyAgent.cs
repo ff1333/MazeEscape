@@ -134,9 +134,9 @@ namespace FogboundMaze
 
         private void AttackPlayer()
         {
-            Play("Idle_Attack", true);
             if (Time.time < nextAttack) return;
             nextAttack = Time.time + (elite ? .78f : 1.05f);
+            Play("Idle_Attack", true);
             if (!Physics.Linecast(transform.position + Vector3.up,
                 player.transform.position + Vector3.up, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
                 player.Health.Damage(damage);
