@@ -530,7 +530,7 @@ MazeExitTrigger
 - Utility AI 在攻击、追击、调查、搜索和巡逻之间的评分边界；
 - 十关 `DungeonCondition` 和局部雾区配置。
 
-### v1.4 PlayMode `42/42`
+### v1.4 PlayMode `44/44`
 
 适合验证需要场景和组件生命周期的行为：
 
@@ -544,6 +544,8 @@ MazeExitTrigger
 - 对象池回收后清空感知记忆；
 - 空弹不自动换弹、备用弹药转移、配镜前三秒减速、背负武器互斥和切刀中断换弹；
 - 固定地下城状态和局部雾区回归。
+- 左半屏浮动摇杆按下、拖动、松手与输入归零；
+- 移动端战斗按钮分区和低分辨率布局边界。
 
 自动测试用于防止版本迭代破坏规则，不能代替真实玩家对难度和手感的判断。
 
@@ -630,17 +632,26 @@ v1.4 的较大系统不得脱离参考直接编写。每一步开始前先查看
 ### 自动验证结果
 
 - EditMode：`21/21 PASS`；
-- PlayMode：`42/42 PASS`；
-- Windows Development：构建成功，`0 errors / 0 warnings`；
+- PlayMode：`44/44 PASS`；
+- Windows Release：构建成功，`0 errors / 0 warnings`；
+- Android Release：构建成功，`0 errors / 0 warnings`；
 - 独立 Player：默认长刀、第三人称狙击枪、配镜、换弹、双手持械和背负武器截图通过检查。
 
 仓库证据索引：[`docs/test-results/v1.4.0/README.md`](test-results/v1.4.0/README.md)。
 
+### 移动端 HUD 收尾
+
+右下角原来同时承担武器状态和操作按钮，Android 上容易重叠。现在 `Weapon HUD` 移到左上顶栏下，只显示武器、弹药、拉栓/换弹进度；右侧保留攻击、开镜、装弹、切枪、切刀和视角按钮，冲刺键放在左下偏中。
+
+左侧固定摇杆改成浮动摇杆：透明触区只覆盖屏幕左半边，按下后在触点显示，拖动产生移动，松手或界面禁用时归零并隐藏。右半屏仍负责镜头滑动。测试直接构造指针按下、拖动和松手事件，验证视觉状态与 `GameInput.Move`。
+
+完整记录见 [`14-v1.4.0-mobile-hud-layout.md`](devlogs/14-v1.4.0-mobile-hud-layout.md)。
+
 ### 尚未完成的发布步骤
 
 - 作者真人完整试玩和难度调平；
-- v1.4.0 Android 构建与真机验收；
-- WebGL 和正式 Windows 非 Development 构建；
+- 最新移动 HUD APK 的真机回归；
+- WebGL 构建；
 - GitHub PR 合并、`v1.4.0` 标签和 Release。
 
 自动测试能证明规则和回归状态，不能代替真人对战斗节奏、换弹压力、雾区可读性和移动手感的判断。

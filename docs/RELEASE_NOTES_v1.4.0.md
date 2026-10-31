@@ -29,8 +29,17 @@
 ## 自动验证
 
 - EditMode：`21/21 PASS`。
-- PlayMode：`42/42 PASS`。
-- Windows Development 构建：成功，`0 errors / 0 warnings`。
+- PlayMode：`44/44 PASS`。
+- Windows Release 构建：成功，`0 errors / 0 warnings`。
+- Android Release 构建：成功，`0 errors / 0 warnings`。
+
+## 2026-10-31 移动 HUD 收尾
+
+- 武器状态面板从右下移到左上顶栏下方，不再与攻击、装弹和切换按钮重叠。
+- 状态文本移除桌面按键提示，只显示当前武器、弹药、拉栓/换弹进度和就绪状态。
+- 左侧固定摇杆改为仅在屏幕左半边触发的浮动摇杆，默认隐藏，松手和界面禁用时归零。
+- 右侧按钮按攻击、开镜、装弹、切枪、切刀和视角分区，冲刺键移到左下偏中。
+- 新增指针事件和按钮布局测试；最新 APK 仍需作者覆盖安装检查多点触控与不同屏幕宽高比。
 - 独立 Player 冒烟：默认长刀、狙击枪第三人称姿态、配镜、手动换弹和地下环境截图成功。
 
 XML 和截图证据见 [`test-results/v1.4.0`](test-results/v1.4.0/README.md)。
@@ -38,6 +47,6 @@ XML 和截图证据见 [`test-results/v1.4.0`](test-results/v1.4.0/README.md)。
 ## 发布边界
 
 - 尚未完成作者真人完整试玩和难度调平。
-- 尚未构建本候选版 Android、WebGL 和正式 Windows 包。
-- 尚未完成 Android 真机验收、GitHub PR 合并、标签和 Release。
+- Android 与正式 Windows 候选包已经构建；WebGL 尚未重建。
+- 作者已试玩此前 Android 候选，最新移动 HUD 包仍需真机回归；GitHub PR 合并、标签和 Release 尚未完成。
 - 自动化证明规则、边界和回归状态，不证明战斗节奏已经达到最终手感。
