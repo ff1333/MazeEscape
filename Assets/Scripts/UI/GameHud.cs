@@ -233,13 +233,25 @@ namespace FogboundMaze
             BuildResult();
             BuildPause();
             BuildCampaignPanels();
-            if (Application.isMobilePlatform)
+            if (ShouldBuildMobileHud())
             {
                 mobileRoot = new GameObject("Mobile Controls", typeof(RectTransform));
                 mobileRoot.transform.SetParent(transform, false);
                 SetRect(mobileRoot.GetComponent<RectTransform>(), Vector2.zero, Vector2.one);
                 MobileHudBuilder.Build(mobileRoot.transform, input, font);
             }
+        }
+
+        private static bool ShouldBuildMobileHud()
+        {
+            if (Application.isMobilePlatform)
+            {
+                return true;
+            }
+
+            return Array.Exists(
+                Environment.GetCommandLineArgs(),
+                value => value == "-fogboundMobileHud");
         }
 
         private void BuildTopBar()
@@ -323,15 +335,15 @@ namespace FogboundMaze
         {
             var root = PanelObject("Weapon HUD", transform, new Color(.025f,.04f,.045f,.90f));
             weaponHud = root;
-            SetRect(root.GetComponent<RectTransform>(), new Vector2(.72f,.035f), new Vector2(.98f,.205f));
+            SetRect(root.GetComponent<RectTransform>(), new Vector2(.018f,.72f), new Vector2(.285f,.90f));
             AddFrame(root);
             gunSlot = PanelObject("Gun Slot", root.transform, new Color(.10f,.18f,.20f,.95f)).GetComponent<Image>();
             SetRect(gunSlot.rectTransform,new Vector2(.04f,.53f),new Vector2(.47f,.93f));
-            var gunLabel = Label("Label",gunSlot.transform,"[1]  SNIPER",23,TextAnchor.MiddleCenter);
+            var gunLabel = Label("Label",gunSlot.transform,"SNIPER",23,TextAnchor.MiddleCenter);
             SetRect(gunLabel.rectTransform,Vector2.zero,Vector2.one);
             bladeSlot = PanelObject("Blade Slot", root.transform, new Color(.10f,.18f,.20f,.95f)).GetComponent<Image>();
             SetRect(bladeSlot.rectTransform,new Vector2(.53f,.53f),new Vector2(.96f,.93f));
-            var bladeLabel = Label("Label",bladeSlot.transform,"[2]  LONG BLADE",21,TextAnchor.MiddleCenter);
+            var bladeLabel = Label("Label",bladeSlot.transform,"LONG BLADE",21,TextAnchor.MiddleCenter);
             SetRect(bladeLabel.rectTransform,Vector2.zero,Vector2.one);
             ammoText = Label("Ammo",root.transform,"05 / 020",30,TextAnchor.MiddleLeft);
             SetRect(ammoText.rectTransform,new Vector2(.06f,.12f),new Vector2(.48f,.50f));
@@ -361,9 +373,9 @@ namespace FogboundMaze
                 ammoText.text = $"{weapon.Ammunition:00} / {weapon.ReserveAmmunition:000}";
                 weaponStateText.text = weapon.IsReloading ? $"RELOAD  {weapon.ReloadProgress:P0}"
                     : weapon.IsCyclingBolt ? $"BOLT  {weapon.BoltProgress:P0}"
-                    : weapon.EmptyFeedback ? "EMPTY - PRESS R"
+                    : weapon.EmptyFeedback ? "EMPTY"
                     : weapon.IsAiming && weapon.AimSlowRemaining > 0f ? $"FOCUS  {weapon.AimSlowRemaining:0.0}s"
-                    : weapon.ReloadReady ? "READY" : "R  RELOAD";
+                    : "READY";
                 weaponStateText.color = weapon.EmptyFeedback ? Warning : weapon.ReloadReady ? Accent : Ink;
                 var progress = weapon.IsReloading ? weapon.ReloadProgress
                     : weapon.IsCyclingBolt ? weapon.BoltProgress : 0f;

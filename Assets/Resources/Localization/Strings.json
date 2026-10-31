@@ -12,7 +12,7 @@
 {"en":"WASD MOVE  |  MOUSE AIM  |  HOLD LEFT CLICK ATTACK\n1 / 2 OR WHEEL SWITCH  |  R MANUAL RELOAD  |  V CAMERA","zh":"WASD 移动  |  鼠标瞄准  |  按住左键攻击\n1 / 2 或滚轮切换武器  |  R 手动换弹  |  V 切换视角"},
 {"en":"LEFT STICK MOVE  |  SWIPE LOOK  |  FIRE ATTACK\nGUN / BLADE SWITCH  |  R MANUAL RELOAD  |  VIEW CAMERA","zh":"左侧摇杆移动  |  滑动屏幕转向  |  攻击键使用武器\n枪 / 刀按钮切换  |  R 键手动换弹  |  视角键切换镜头"},
 {"en":"WASD MOVE  |  LEFT CLICK ATTACK  |  RIGHT CLICK SCOPE\n1 / 2 OR WHEEL SWITCH  |  R MANUAL RELOAD  |  V CAMERA","zh":"WASD 移动  |  左键攻击  |  右键开镜\n1 / 2 或滚轮切换武器  |  R 手动换弹  |  V 切换视角"},
-{"en":"FIRE","zh":"攻击"},{"en":"RUN","zh":"冲刺"},{"en":"VIEW","zh":"视角"},
+{"en":"FIRE","zh":"攻击"},{"en":"ATTACK","zh":"攻击"},{"en":"RUN","zh":"冲刺"},{"en":"SPRINT","zh":"冲刺"},{"en":"VIEW","zh":"视角"},{"en":"EMPTY","zh":"弹匣为空"},
 {"en":"ENTRY","zh":"初入迷宫"},{"en":"CROSSROADS","zh":"岔路渐多"},{"en":"NOISE","zh":"噪声威胁"},{"en":"FOG ZONES","zh":"局部雾区"},{"en":"CONTAMINATION","zh":"污染区域"},{"en":"DEEP ZONE","zh":"深入险境"},{"en":"LAST EXIT","zh":"最后出口"},
 {"en":"THE FIRST EXIT","zh":"第一个出口"},{"en":"MORE CROSSROADS","zh":"更多岔路"},{"en":"GROWING PURSUIT","zh":"追击升级"},{"en":"HEAVY ELITES","zh":"强力精英"},{"en":"DAY AND NIGHT","zh":"昼夜交替"},{"en":"MIASMA AND SAFE LIGHTS","zh":"瘴气与避难灯"},{"en":"THE LAST EXIT","zh":"最后的出口"},
 {"en":"Learn the corridors. Ordinary zombies follow the maze paths. Reach the exit alive.","zh":"熟悉通道。普通僵尸会沿迷宫追击，活着抵达出口即可通关。"},
