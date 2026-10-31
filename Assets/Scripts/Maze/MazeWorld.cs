@@ -17,6 +17,7 @@ namespace FogboundMaze
         private Material wallBaseMaterial;
         private Material entryMaterial;
         private Material fogMaterial;
+        private Texture2D fogTexture;
         private Transform generatedRoot;
 
         public MazeLayout Layout { get; private set; }
@@ -319,36 +320,110 @@ namespace FogboundMaze
                 fogZones.Add(center);
                 var root = new GameObject("Local Fog Zone");
                 root.transform.SetParent(generatedRoot, false);
-                root.transform.position = center + Vector3.up * 1.1f;
-                var particles = root.AddComponent<ParticleSystem>();
-                var main = particles.main;
-                main.loop = true;
-                main.startLifetime = new ParticleSystem.MinMaxCurve(4.5f, 7.5f);
-                main.startSpeed = new ParticleSystem.MinMaxCurve(.04f, .16f);
-                main.startSize = new ParticleSystem.MinMaxCurve(1.4f, 3.2f);
-                main.startColor = new Color(.62f,.78f,.72f,.30f);
-                main.maxParticles = 130;
-                var emission = particles.emission;
-                emission.rateOverTime = 20f;
-                var shape = particles.shape;
-                shape.shapeType = ParticleSystemShapeType.Box;
-                shape.scale = new Vector3(CellSize * .88f, 1.9f, CellSize * .88f);
-                var renderer = root.GetComponent<ParticleSystemRenderer>();
-                renderer.sharedMaterial = fogMaterial;
-                renderer.renderMode = ParticleSystemRenderMode.Billboard;
-                renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-                renderer.receiveShadows = false;
-                particles.Play();
+                root.transform.position = center;
+
+                CreateFogLayer(root.transform, "Ground Mist", new Vector3(0f,.28f,0f),
+                    new Vector3(1f,.12f,1f), 2.8f, new Vector2(2.6f,4.8f),
+                    new Vector2(7f,11f), new Vector2(.06f,.16f), 4.5f, 48,
+                    new Color(.54f,.69f,.64f,.13f), .18f);
+                CreateFogLayer(root.transform, "Drifting Mist", new Vector3(0f,1.15f,0f),
+                    new Vector3(1f,.55f,1f), 2.45f, new Vector2(1.35f,3.1f),
+                    new Vector2(5.5f,9f), new Vector2(.06f,.18f), 6f, 56,
+                    new Color(.62f,.76f,.70f,.11f), .28f);
+                CreateFogLayer(root.transform, "Suspended Dust", new Vector3(0f,.9f,0f),
+                    new Vector3(1f,.72f,1f), 2.5f, new Vector2(.025f,.055f),
+                    new Vector2(4f,7f), new Vector2(.03f,.10f), 3.5f, 24,
+                    new Color(.72f,.84f,.76f,.14f), .08f);
             }
         }
 
-        private static Material CreateFogMaterial()
+        private void CreateFogLayer(
+            Transform parent,
+            string name,
+            Vector3 localPosition,
+            Vector3 shapeScale,
+            float radius,
+            Vector2 size,
+            Vector2 lifetime,
+            Vector2 speed,
+            float emissionRate,
+            int maxParticles,
+            Color color,
+            float noiseStrength)
+        {
+            var layer = new GameObject(name);
+            layer.transform.SetParent(parent, false);
+            layer.transform.localPosition = localPosition;
+            layer.transform.localScale = shapeScale;
+
+            var particles = layer.AddComponent<ParticleSystem>();
+            particles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            var main = particles.main;
+            main.loop = true;
+            main.playOnAwake = false;
+            main.simulationSpace = ParticleSystemSimulationSpace.Local;
+            main.scalingMode = ParticleSystemScalingMode.Shape;
+            main.startLifetime = new ParticleSystem.MinMaxCurve(lifetime.x, lifetime.y);
+            main.startSpeed = new ParticleSystem.MinMaxCurve(speed.x, speed.y);
+            main.startSize = new ParticleSystem.MinMaxCurve(size.x, size.y);
+            main.startRotation = new ParticleSystem.MinMaxCurve(0f, Mathf.PI * 2f);
+            main.startColor = color;
+            main.maxParticles = maxParticles;
+
+            var emission = particles.emission;
+            emission.rateOverTime = emissionRate;
+
+            var shape = particles.shape;
+            shape.shapeType = ParticleSystemShapeType.Sphere;
+            shape.radius = radius;
+            shape.radiusThickness = .82f;
+
+            var noise = particles.noise;
+            noise.enabled = true;
+            noise.quality = ParticleSystemNoiseQuality.Low;
+            noise.strength = noiseStrength;
+            noise.frequency = .18f;
+            noise.scrollSpeed = .05f;
+            noise.damping = true;
+            noise.octaveCount = 1;
+
+            var fade = new Gradient();
+            fade.SetKeys(
+                new[]
+                {
+                    new GradientColorKey(Color.white, 0f),
+                    new GradientColorKey(Color.white, 1f)
+                },
+                new[]
+                {
+                    new GradientAlphaKey(0f, 0f),
+                    new GradientAlphaKey(1f, .18f),
+                    new GradientAlphaKey(.72f, .72f),
+                    new GradientAlphaKey(0f, 1f)
+                });
+            var colorOverLifetime = particles.colorOverLifetime;
+            colorOverLifetime.enabled = true;
+            colorOverLifetime.color = fade;
+
+            var renderer = layer.GetComponent<ParticleSystemRenderer>();
+            renderer.sharedMaterial = fogMaterial;
+            renderer.renderMode = ParticleSystemRenderMode.Billboard;
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
+            renderer.sortingFudge = 1f;
+            particles.Play();
+        }
+
+        private Material CreateFogMaterial()
         {
             var shader = Shader.Find("Universal Render Pipeline/Particles/Unlit")
                 ?? Shader.Find("Particles/Standard Unlit") ?? Shader.Find("Sprites/Default");
             var material = new Material(shader) { name = "Local Dungeon Fog" };
-            material.color = new Color(.62f,.78f,.72f,.42f);
+            fogTexture = CreateSoftFogTexture();
+            material.color = Color.white;
             if (material.HasProperty("_BaseColor")) material.SetColor("_BaseColor", material.color);
+            if (material.HasProperty("_BaseMap")) material.SetTexture("_BaseMap", fogTexture);
+            if (material.HasProperty("_MainTex")) material.SetTexture("_MainTex", fogTexture);
             material.SetOverrideTag("RenderType", "Transparent");
             if (material.HasProperty("_Surface")) material.SetFloat("_Surface", 1f);
             if (material.HasProperty("_Blend")) material.SetFloat("_Blend", 0f);
@@ -358,6 +433,30 @@ namespace FogboundMaze
             material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
             material.renderQueue = 3000;
             return material;
+        }
+
+        private static Texture2D CreateSoftFogTexture()
+        {
+            const int size = 64;
+            var texture = new Texture2D(size, size, TextureFormat.RGBA32, false)
+            {
+                name = "Runtime Soft Fog",
+                wrapMode = TextureWrapMode.Clamp,
+                filterMode = FilterMode.Bilinear
+            };
+            var pixels = new Color[size * size];
+            for (var y = 0; y < size; y++)
+            for (var x = 0; x < size; x++)
+            {
+                var uv = new Vector2((x + .5f) / size, (y + .5f) / size);
+                var distance = Vector2.Distance(uv, Vector2.one * .5f) * 2f;
+                var edge = Mathf.SmoothStep(1f, 0f, Mathf.InverseLerp(.18f, 1f, distance));
+                var cloud = .72f + Mathf.PerlinNoise(uv.x * 4.3f + 7.1f, uv.y * 4.3f + 2.7f) * .28f;
+                pixels[y * size + x] = new Color(1f, 1f, 1f, edge * cloud);
+            }
+            texture.SetPixels(pixels);
+            texture.Apply(false, true);
+            return texture;
         }
 
         private void CreateSafeLight(Vector3 position)

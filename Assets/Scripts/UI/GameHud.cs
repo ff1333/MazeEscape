@@ -50,6 +50,7 @@ namespace FogboundMaze
         private Image fogWash;
         private Image fogVignette;
         private Texture2D fogVignetteTexture;
+        private float fogOverlayBlend;
         private GameObject scopeOverlay;
         private Text scopeStatus;
         private Texture2D scopeTexture;
@@ -307,9 +308,15 @@ namespace FogboundMaze
         {
             var active = GameDirector.Instance != null && GameDirector.Instance.Phase == GamePhase.Playing
                 && GameDirector.Instance.IsPlayerInFog;
-            var pulse = active ? .015f * (Mathf.Sin(Time.unscaledTime * 1.7f) * .5f + .5f) : 0f;
-            fogWash.color = active ? new Color(.45f,.58f,.56f,.10f + pulse) : Color.clear;
-            fogVignette.color = active ? new Color(.34f,.48f,.46f,.42f + pulse) : Color.clear;
+            var target = active ? 1f : 0f;
+            var fadeSpeed = active ? 1.8f : 2.8f;
+            fogOverlayBlend = Mathf.MoveTowards(
+                fogOverlayBlend,
+                target,
+                Time.unscaledDeltaTime * fadeSpeed);
+            var pulse = .008f * (Mathf.Sin(Time.unscaledTime * 1.3f) * .5f + .5f);
+            fogWash.color = new Color(.45f,.58f,.56f,(.035f + pulse) * fogOverlayBlend);
+            fogVignette.color = new Color(.34f,.48f,.46f,(.18f + pulse) * fogOverlayBlend);
         }
 
         private void BuildWeaponHud()

@@ -426,6 +426,13 @@ namespace FogboundMaze.Tests
             Assert.That(director.CurrentLevel.environment, Is.EqualTo(DungeonCondition.DeepCore));
             Assert.That(director.World.FogZones.Count, Is.EqualTo(8));
             Assert.That(director.World.LocalVisibilityMultiplier(director.World.FogZones[0]), Is.EqualTo(.55f));
+            var fogZone = GameObject.Find("Local Fog Zone");
+            Assert.That(fogZone, Is.Not.Null);
+            var fogLayers = fogZone.GetComponentsInChildren<ParticleSystem>();
+            Assert.That(fogLayers, Has.Length.EqualTo(3));
+            var fogParticleBudget = 0;
+            foreach (var layer in fogLayers) fogParticleBudget += layer.main.maxParticles;
+            Assert.That(fogParticleBudget, Is.LessThanOrEqualTo(140));
             Assert.That(director.EnemyPoolCapacity, Is.GreaterThanOrEqualTo(14));
             director.SelectWeapon(WeaponType.SniperRifle);
             director.BeginRun();
